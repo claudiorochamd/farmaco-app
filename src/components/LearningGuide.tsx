@@ -11,7 +11,6 @@ const TOPICS = [
   { id: 'agon_c', label: 'Agonistas Colinérgicos',      color: '#27ae60' },
   { id: 'bloq_c', label: 'Bloqueadores Colinérgicos',   color: '#8e44ad' },
   { id: 'inter',  label: 'Interações Medicamentosas',   color: '#f39c12' },
-  { id: 'sobre',  label: 'Sobre este Projeto',          color: '#c9d1d9' },
 ];
 
 import { drugs } from '../data/drugs';
@@ -80,7 +79,6 @@ export default function LearningGuide({ onSimulateInteraction, onSimulateDrug }:
           {active === 'agon_c' && <AgonColin onSimulate={onSimulateDrug} />}
           {active === 'bloq_c' && <BloqColin onSimulate={onSimulateDrug} />}
           {active === 'inter'  && <InterSection onSimulate={onSimulateInteraction} />}
-          {active === 'sobre'  && <SobreSection />}
         </div>
       </div>
     </div>
@@ -830,70 +828,6 @@ function DrugList({ items, onSimulate }: {
           )}
         </div>
       ))}
-    </div>
-  );
-}
-
-// ─── SOBRE ESTE PROJETO ──────────────────────────────────────────────────────
-function SobreSection() {
-  const techs = [
-    { name: 'React 19',         desc: 'Biblioteca JavaScript para construção de interfaces de usuário com componentes reutilizáveis.' },
-    { name: 'TypeScript',       desc: 'Superset do JavaScript com tipagem estática, garantindo segurança e autocompletar durante o desenvolvimento.' },
-    { name: 'Vite',             desc: 'Ferramenta de build moderna, com servidor de desenvolvimento ultrarrápido e hot module replacement (HMR).' },
-    { name: 'Tailwind CSS v4',  desc: 'Framework de CSS utilitário configurado diretamente via plugin Vite, sem arquivo de configuração separado.' },
-    { name: 'Vercel',           desc: 'Plataforma de hospedagem e deploy contínuo. O site é atualizado automaticamente a cada novo push.' },
-    { name: 'GitHub',           desc: 'Versionamento do código-fonte com controle de histórico de mudanças e colaboração.' },
-  ];
-
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-
-      {/* Apresentação */}
-      <InfoBox color="#c9d1d9">
-        Este simulador foi desenvolvido como ferramenta de apoio ao estudo da farmacologia do sistema nervoso autônomo,
-        permitindo visualizar de forma interativa os efeitos de fármacos adrenérgicos e colinérgicos no organismo humano.
-      </InfoBox>
-
-      {/* Criador */}
-      <div style={{ background: '#111c2b', border: '1px solid #2ecc7133', borderRadius: 12, padding: '20px 24px' }}>
-        <div style={{ fontSize: 11, color: '#2ecc71', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 600, marginBottom: 10 }}>
-          Desenvolvido por
-        </div>
-        <div style={{ fontSize: 20, fontWeight: 700, color: '#e6edf3', marginBottom: 4 }}>Cláudio Rocha</div>
-        <div style={{ fontSize: 13, color: '#8b949e', marginBottom: 12 }}>
-          Estudante de Medicina · 3º Período · Turma 158 · Universidade Federal de Pernambuco (UFPE)
-        </div>
-        <a
-          href="mailto:claudio.filho@ufpe.br"
-          style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: '#2ecc7115', border: '1px solid #2ecc7144', borderRadius: 6, padding: '7px 14px', color: '#2ecc71', fontSize: 13, textDecoration: 'none', fontWeight: 500 }}
-        >
-          claudio.filho@ufpe.br
-        </a>
-      </div>
-
-      {/* Tecnologias */}
-      <div>
-        <SectionTitle>Tecnologias Utilizadas</SectionTitle>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginTop: 8 }}>
-          {techs.map(t => (
-            <div key={t.name} style={{ background: '#111c2b', border: '1px solid #21262d', borderRadius: 8, padding: '12px 14px' }}>
-              <div style={{ color: '#e6edf3', fontWeight: 700, fontSize: 13, marginBottom: 4 }}>{t.name}</div>
-              <p style={{ margin: 0, fontSize: 12, color: '#6b7280', lineHeight: 1.6 }}>{t.desc}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Objetivo */}
-      <div style={{ background: '#111c2b', border: '1px solid #7fdbff22', borderLeft: '3px solid #7fdbff55', borderRadius: 8, padding: '14px 18px' }}>
-        <div style={{ color: '#7fdbff', fontWeight: 600, fontSize: 13, marginBottom: 6 }}>Objetivo educacional</div>
-        <p style={{ margin: 0, fontSize: 12, color: '#8b949e', lineHeight: 1.7 }}>
-          O simulador visa complementar o aprendizado teórico de farmacologia, tornando visíveis os efeitos
-          fisiológicos de fármacos sobre o sistema nervoso autônomo. Não substitui o estudo aprofundado nem
-          deve ser utilizado para fins clínicos ou de prescrição médica.
-        </p>
-      </div>
-
     </div>
   );
 }
