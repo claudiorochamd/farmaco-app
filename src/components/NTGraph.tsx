@@ -74,7 +74,6 @@ export default function NTGraph({ levels }: Props) {
       const pw = W - PL - PR;
       const ph = H - PT - PB;
       const hist = historyRef.current;
-      const n    = hist.length;
 
       // ── Fundo ──────────────────────────────────────────────
       ctx.fillStyle = '#070c12';
