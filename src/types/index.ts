@@ -2,7 +2,15 @@ export type DrugClass =
   | 'agonista_adrenergico'
   | 'bloqueador_adrenergico'
   | 'agonista_colinergico'
-  | 'bloqueador_colinergico';
+  | 'bloqueador_colinergico'
+  | 'variedades';
+
+export interface NTLevels {
+  ne:  number; // Noradrenalina  0–100
+  ach: number; // Acetilcolina   0–100
+  da:  number; // Dopamina       0–100
+  epi: number; // Adrenalina     0–100
+}
 
 export interface DrugEffects {
   heartRate: number;

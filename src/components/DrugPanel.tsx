@@ -11,6 +11,7 @@ const CLASS_INFO: Record<DrugClass, { label: string; color: string }> = {
   bloqueador_adrenergico: { label: 'Bloqueadores Adrenérgicos', color: '#95a5a6' },
   agonista_colinergico:   { label: 'Agonistas Colinérgicos',   color: '#27ae60' },
   bloqueador_colinergico: { label: 'Bloqueadores Colinérgicos', color: '#8e44ad' },
+  variedades:             { label: 'Variedades',                color: '#e8c07d' },
 };
 
 const CLASSES: DrugClass[] = [
@@ -18,6 +19,7 @@ const CLASSES: DrugClass[] = [
   'bloqueador_adrenergico',
   'agonista_colinergico',
   'bloqueador_colinergico',
+  'variedades',
 ];
 
 export default function DrugPanel({ onAdminister }: Props) {

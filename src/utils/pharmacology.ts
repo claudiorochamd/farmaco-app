@@ -1,4 +1,4 @@
-import type { ActiveDrug, VitalSigns, BodyVisualState } from '../types';
+import type { ActiveDrug, VitalSigns, BodyVisualState, NTLevels } from '../types';
 
 const BASELINE_VITALS: VitalSigns = {
   heartRate: 70,
@@ -95,6 +95,68 @@ export function vitalColor(value: number, normal: [number, number], warning: [nu
   if (value >= normal[0] && value <= normal[1]) return '#2ecc71';
   if (value >= warning[0] && value <= warning[1]) return '#f39c12';
   return '#e74c3c';
+}
+
+// ─── Neurotransmissores ───────────────────────────────────────────────────────
+const NT_BASELINE: NTLevels = { ne: 30, ach: 30, da: 15, epi: 8 };
+
+const NT_MAP: Record<string, Partial<NTLevels>> = {
+  epinefrina:     { ne: 20, epi: 55 },
+  norepinefrina:  { ne: 62, epi: 8  },
+  dopamina:       { da: 60, ne: 18  },
+  dobutamina:     { ne: 22 },
+  salbutamol:     { ne: 10 },
+  isoproterenol:  { ne: 18 },
+  fenilefrina:    { ne: 28 },
+  clonidina:      { ne: -28 },
+  propranolol:    { ne: -14 },
+  metoprolol:     { ne: -12 },
+  atenolol:       { ne: -10 },
+  fentolamina:    { ne: -18 },
+  prazosina:      { ne: -15 },
+  labetalol:      { ne: -20 },
+  acetilcolina:   { ach: 62 },
+  pilocarpina:    { ach: 48 },
+  carbacol:       { ach: 52 },
+  betanecol:      { ach: 32 },
+  neostigmina:    { ach: 42 },
+  fisostigmina:   { ach: 46 },
+  atropina:       { ach: -42 },
+  escopolamina:   { ach: -32 },
+  glicopirrolato: { ach: -36 },
+  ipratropio:     { ach: -14 },
+  // Variedades
+  cigarro:        { ne: 20, ach: 14, da: 12 },
+  cafe:           { ne: 12, da: 5   },
+  energetico:     { ne: 28, da: 8   },
+  chumbinho:      { ach: 75 },
+  cocaina:        { ne: 52, da: 46  },
+};
+
+export function calculateNTLevels(activeDrugs: ActiveDrug[]): NTLevels {
+  if (activeDrugs.length === 0) return { ...NT_BASELINE };
+  let { ne, ach, da, epi } = NT_BASELINE;
+  for (const { drug, dose } of activeDrugs) {
+    const f = dose / drug.maxDose;
+    const m = NT_MAP[drug.id];
+    if (m) {
+      ne  += (m.ne  ?? 0) * f;
+      ach += (m.ach ?? 0) * f;
+      da  += (m.da  ?? 0) * f;
+      epi += (m.epi ?? 0) * f;
+    } else {
+      if (drug.class === 'agonista_adrenergico')   ne  += 15 * f;
+      if (drug.class === 'bloqueador_adrenergico')  ne  -= 10 * f;
+      if (drug.class === 'agonista_colinergico')    ach += 30 * f;
+      if (drug.class === 'bloqueador_colinergico')  ach -= 25 * f;
+    }
+  }
+  return {
+    ne:  clamp(ne,  0, 100),
+    ach: clamp(ach, 0, 100),
+    da:  clamp(da,  0, 100),
+    epi: clamp(epi, 0, 100),
+  };
 }
 
 export function tempColor(t: number): string {

@@ -14,6 +14,8 @@ import ScenariosPanel from './components/ScenariosPanel';
 import { drugs as allDrugs } from './data/drugs';
 import type { Scenario } from './data/scenarios';
 import { getActiveCritical, type CriticalThreshold } from './data/thresholds';
+import NTGraph from './components/NTGraph';
+import { calculateNTLevels } from './utils/pharmacology';
 import { useWindowWidth } from './hooks/useWindowWidth';
 
 let idCounter = 0;
@@ -48,6 +50,7 @@ export default function App() {
   const bodyState    = useMemo(() => calculateBodyState(activeDrugs),               [activeDrugs]);
   const drugIds      = useMemo(() => [...new Set(activeDrugs.map(d => d.drug.id))], [activeDrugs]);
   const interactions = useMemo(() => getActiveInteractions(drugIds),                [drugIds]);
+  const ntLevels     = useMemo(() => calculateNTLevels(activeDrugs),               [activeDrugs]);
 
   // Timer do cenário
   useEffect(() => {
@@ -204,6 +207,11 @@ export default function App() {
         {bodyState.tremor        >  0.3 && <Badge text="Tremor"          color="#e67e22"/>}
         {bodyState.pupilNormalized > 0.72 && <Badge text="Midríase"      color="#e74c3c"/>}
         {bodyState.pupilNormalized < 0.28 && <Badge text="Miose"         color="#3498db"/>}
+      </div>
+
+      {/* Gráfico de neurotransmissores */}
+      <div style={{ width: '100%', maxWidth: 420, padding: '0 4px', flexShrink: 0 }}>
+        <NTGraph levels={ntLevels} />
       </div>
     </div>
   );
