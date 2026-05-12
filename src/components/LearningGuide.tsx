@@ -2,22 +2,25 @@ import { useState } from 'react';
 import { useWindowWidth } from '../hooks/useWindowWidth';
 
 const TOPICS = [
-  { id: 'sna',     label: 'Visão Geral do SNA',             color: '#7fdbff' },
-  { id: 'trans',   label: 'Neurotransmissão',                color: '#7fdbff' },
-  { id: 'rec_a',   label: 'Receptores Adrenérgicos',         color: '#e67e22' },
-  { id: 'rec_c',   label: 'Receptores Colinérgicos',         color: '#27ae60' },
-  { id: 'agon_a',  label: 'Agonistas Adrenérgicos',          color: '#e67e22' },
-  { id: 'bloq_a',  label: 'Bloqueadores Adrenérgicos',       color: '#95a5a6' },
-  { id: 'agon_c',  label: 'Agonistas Colinérgicos',          color: '#27ae60' },
-  { id: 'bloq_c',  label: 'Bloqueadores Colinérgicos',       color: '#8e44ad' },
-  { id: 'inter',   label: 'Interações Medicamentosas',       color: '#f39c12' },
-  { id: 'tabela',  label: 'Tabela Resumo',                   color: '#c9d1d9' },
+  { id: 'sna',    label: 'Visão Geral do SNA',         color: '#7fdbff' },
+  { id: 'trans',  label: 'Neurotransmissão',            color: '#7fdbff' },
+  { id: 'rec_a',  label: 'Receptores Adrenérgicos',     color: '#e67e22' },
+  { id: 'rec_c',  label: 'Receptores Colinérgicos',     color: '#27ae60' },
+  { id: 'agon_a', label: 'Agonistas Adrenérgicos',      color: '#e67e22' },
+  { id: 'bloq_a', label: 'Bloqueadores Adrenérgicos',   color: '#95a5a6' },
+  { id: 'agon_c', label: 'Agonistas Colinérgicos',      color: '#27ae60' },
+  { id: 'bloq_c', label: 'Bloqueadores Colinérgicos',   color: '#8e44ad' },
+  { id: 'inter',  label: 'Interações Medicamentosas',   color: '#f39c12' },
 ];
 
 import { drugs } from '../data/drugs';
 import { interactions } from '../data/interactions';
 
-export default function LearningGuide() {
+interface Props {
+  onSimulateInteraction: (id1: string, id2: string) => void;
+}
+
+export default function LearningGuide({ onSimulateInteraction }: Props) {
   const [active, setActive] = useState('sna');
   const width    = useWindowWidth();
   const isMobile = width < 700;
@@ -74,8 +77,7 @@ export default function LearningGuide() {
           {active === 'bloq_a' && <BloqAdren />}
           {active === 'agon_c' && <AgonColin />}
           {active === 'bloq_c' && <BloqColin />}
-          {active === 'inter'  && <InterSection />}
-          {active === 'tabela' && <SummaryTable />}
+          {active === 'inter'  && <InterSection onSimulate={onSimulateInteraction} />}
         </div>
       </div>
     </div>
@@ -708,7 +710,7 @@ function BloqColin() {
 }
 
 // ─── INTERAÇÕES ───────────────────────────────────────────────────────────────
-function InterSection() {
+function InterSection({ onSimulate }: { onSimulate: (id1: string, id2: string) => void }) {
   const sevOrder = { danger: 0, warning: 1, info: 2 };
   const sorted = [...interactions].sort((a, b) => sevOrder[a.severity] - sevOrder[b.severity]);
   const sevStyle = {
@@ -720,76 +722,46 @@ function InterSection() {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
       <InfoBox color="#f39c12">
         Interações farmacodinâmicas ocorrem quando dois fármacos alteram mutuamente seus efeitos nos receptores.
-        Podem ser <strong>antagônicas</strong>, <strong>sinérgicas</strong> ou causar <strong>reversão de efeito</strong>
-        (ex: bloqueio seletivo de um receptor expõe os efeitos do outro).
+        Podem ser <strong>antagônicas</strong>, <strong>sinérgicas</strong> ou causar <strong>reversão de efeito</strong>.
+        Toque em <strong>Simular no boneco</strong> para visualizar a interação em tempo real.
       </InfoBox>
       {sorted.map((inter, i) => {
         const s = sevStyle[inter.severity];
+        const d1 = drugs.find(d => d.id === inter.drugIds[0]);
+        const d2 = drugs.find(d => d.id === inter.drugIds[1]);
         return (
           <div key={i} style={{ background: s.bg, border: `1px solid ${s.border}`, borderRadius: 10, padding: '14px 18px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8, flexWrap: 'wrap' }}>
               <span style={{ fontSize: 11, fontWeight: 700, color: s.color, background: `${s.border}`, borderRadius: 4, padding: '2px 8px' }}>{s.badge}</span>
               <span style={{ fontWeight: 700, fontSize: 14, color: s.color }}>{inter.title}</span>
             </div>
-            <div style={{ display: 'flex', gap: 6, marginBottom: 8, flexWrap: 'wrap' }}>
-              {inter.drugIds.map(id => {
-                const d = drugs.find(drug => drug.id === id);
-                return <Pill key={id} color={s.color}>{d?.name ?? id}</Pill>;
-              })}
+            <div style={{ display: 'flex', gap: 6, marginBottom: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+              <Pill color={s.color}>{d1?.name ?? inter.drugIds[0]}</Pill>
+              <span style={{ color: '#4d6a7a', fontSize: 12 }}>+</span>
+              <Pill color={s.color}>{d2?.name ?? inter.drugIds[1]}</Pill>
             </div>
-            <p style={{ margin: 0, fontSize: 12, color: '#8b949e', lineHeight: 1.7 }}>{inter.description}</p>
+            <p style={{ margin: '0 0 12px', fontSize: 12, color: '#8b949e', lineHeight: 1.7 }}>{inter.description}</p>
+            <button
+              onClick={() => onSimulate(inter.drugIds[0], inter.drugIds[1])}
+              style={{
+                background: `${s.color}18`,
+                border: `1px solid ${s.color}66`,
+                borderRadius: 6,
+                padding: '7px 14px',
+                color: s.color,
+                fontSize: 12,
+                fontWeight: 600,
+                cursor: 'pointer',
+                transition: 'background 0.15s',
+              }}
+              onMouseEnter={e => (e.currentTarget.style.background = `${s.color}30`)}
+              onMouseLeave={e => (e.currentTarget.style.background = `${s.color}18`)}
+            >
+              Simular no boneco
+            </button>
           </div>
         );
       })}
-    </div>
-  );
-}
-
-// ─── TABELA RESUMO ────────────────────────────────────────────────────────────
-function SummaryTable() {
-  const CLASS_COLOR: Record<string, string> = {
-    agonista_adrenergico:   '#e67e22',
-    bloqueador_adrenergico: '#95a5a6',
-    agonista_colinergico:   '#27ae60',
-    bloqueador_colinergico: '#8e44ad',
-  };
-  const CLASS_LABEL: Record<string, string> = {
-    agonista_adrenergico:   'Ag. Adrenérgico',
-    bloqueador_adrenergico: 'Bloq. Adrenérgico',
-    agonista_colinergico:   'Ag. Colinérgico',
-    bloqueador_colinergico: 'Bloq. Colinérgico',
-  };
-  return (
-    <div style={{ overflowX: 'auto' }}>
-      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 11 }}>
-        <thead>
-          <tr style={{ background: '#111c2b' }}>
-            <Th>Fármaco</Th><Th>Classe</Th><Th>Receptores</Th>
-            <Th color="#2ecc71">FC</Th><Th color="#e74c3c">PAS</Th>
-            <Th color="#3498db">Brônquio</Th><Th color="#f39c12">Pupila</Th><Th>TGI</Th>
-          </tr>
-        </thead>
-        <tbody>
-          {drugs.map((d, i) => {
-            const color = CLASS_COLOR[d.class];
-            const fmt = (v: number) => (
-              <td style={{ padding: '7px 10px', textAlign: 'center', fontFamily: 'monospace', fontWeight: 600, color: v > 0 ? '#2ecc71' : v < 0 ? '#e74c3c' : '#6b7280', background: i % 2 === 0 ? '#0d1117' : '#0e1622' }}>
-                {v > 0 ? '+' : ''}{v}%
-              </td>
-            );
-            return (
-              <tr key={d.id}>
-                <td style={{ padding: '7px 10px', color, fontWeight: 600, background: i % 2 === 0 ? '#0d1117' : '#0e1622', whiteSpace: 'nowrap' }}>{d.name}</td>
-                <td style={{ padding: '7px 10px', background: i % 2 === 0 ? '#0d1117' : '#0e1622' }}>
-                  <span style={{ fontSize: 10, color, background: `${color}18`, border: `1px solid ${color}33`, borderRadius: 4, padding: '2px 6px', whiteSpace: 'nowrap' }}>{CLASS_LABEL[d.class]}</span>
-                </td>
-                <td style={{ padding: '7px 10px', color: '#6b7280', background: i % 2 === 0 ? '#0d1117' : '#0e1622' }}>{d.receptors.join(', ')}</td>
-                {fmt(d.effects.heartRate)}{fmt(d.effects.systolicBP)}{fmt(d.effects.bronchialDiameter)}{fmt(d.effects.pupilDilation)}{fmt(d.effects.giMotility)}
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
     </div>
   );
 }

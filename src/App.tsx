@@ -9,6 +9,7 @@ import ActiveDrugsList from './components/ActiveDrugsList';
 import InteractionAlert from './components/InteractionAlert';
 import IntroScreen from './components/IntroScreen';
 import LearningGuide from './components/LearningGuide';
+import { drugs as allDrugs } from './data/drugs';
 import { useWindowWidth } from './hooks/useWindowWidth';
 
 let idCounter = 0;
@@ -39,6 +40,18 @@ export default function App() {
     setActiveDrugs(prev => prev.filter(d => d.instanceId !== id));
   }
   function handleClearAll() { setActiveDrugs([]); }
+
+  function handleSimulateInteraction(id1: string, id2: string) {
+    const d1 = allDrugs.find(d => d.id === id1);
+    const d2 = allDrugs.find(d => d.id === id2);
+    if (!d1 || !d2) return;
+    setActiveDrugs([
+      { instanceId: `${id1}-sim`, drug: d1, dose: d1.maxDose * 0.6 },
+      { instanceId: `${id2}-sim`, drug: d2, dose: d2.maxDose * 0.6 },
+    ]);
+    setMode('sim');
+    setMobilePanel('boneco');
+  }
 
   // ── Reutilizável: centro com boneco ───────────────────────────────────────
   const CharacterCenter = (
@@ -178,7 +191,7 @@ export default function App() {
       </div>
 
       {/* ── GUIA ───────────────────────────────────────────── */}
-      {mode === 'guia' && <LearningGuide />}
+      {mode === 'guia' && <LearningGuide onSimulateInteraction={handleSimulateInteraction} />}
 
       {/* ── SIMULAÇÃO ──────────────────────────────────────── */}
       {mode === 'sim' && (
