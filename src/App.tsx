@@ -17,6 +17,7 @@ import { SCENARIO_QUIZZES } from './data/quiz';
 import { saveRecord, makeId, type SessionRecord } from './data/sessionHistory';
 import { getActiveCritical, type CriticalThreshold } from './data/thresholds';
 import QuizPanel, { QuizResult } from './components/QuizPanel';
+import Tutorial from './components/Tutorial';
 import OrganInfoPanel, { type OrganKey } from './components/OrganInfoPanel';
 import NTGraph from './components/NTGraph';
 import { calculateNTLevels } from './utils/pharmacology';
@@ -59,6 +60,9 @@ export default function App() {
 
   // Anatomia interativa
   const [activeOrgan, setActiveOrgan] = useState<OrganKey | null>(null);
+
+  // Tutorial de primeira vez
+  const [showTutorial, setShowTutorial] = useState(false);
   const [mobilePanel, setMobilePanel] = useState<MobilePanel>('boneco');
   const [activeDrugs, setActiveDrugs] = useState<ActiveDrug[]>([]);
   const [isLight, setIsLight]         = useState(() => localStorage.getItem('theme') === 'light');
@@ -151,7 +155,12 @@ export default function App() {
     ? activeScenario.baselineBodyState
     : bodyState;
 
-  if (!started) return <IntroScreen onStart={() => setStarted(true)} />;
+  if (!started) return (
+    <IntroScreen onStart={() => {
+      setStarted(true);
+      if (!localStorage.getItem('farmaco_tutorial_done')) setShowTutorial(true);
+    }} />
+  );
 
   function handleAdminister(drug: Drug, dose: number) {
     // Rastreia fármacos errados durante cenário
@@ -734,6 +743,8 @@ export default function App() {
         ::-webkit-scrollbar-thumb:hover { background: #30363d; }
         @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.55;} }
       `}</style>
+
+      {showTutorial && <Tutorial onClose={() => setShowTutorial(false)} />}
     </div>
   );
 }
