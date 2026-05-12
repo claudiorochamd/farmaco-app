@@ -195,4 +195,34 @@ export const scenarios: Scenario[] = [
       tremor: 0.3, giMotility: 2.5,
     },
   },
+  {
+    id: 'pcr',
+    title: 'Parada Cardiorrespiratória',
+    severity: 'critical',
+    color: '#c0392b',
+    situation:
+      'Paciente colapsa subitamente em assistolia. Sem pulso, sem respiração espontânea, sem resposta a estímulos. Pupilas fixas e dilatadas. RCP em andamento.',
+    drugNames: ['Epinefrina'],
+    drugs: [{ drugId: 'epinefrina', dosePercent: 1.0 }],
+    rationale:
+      'A epinefrina é o único fármaco vasoativo recomendado no protocolo ACLS/RCP. A ação β1 restaura o automatismo e a contratilidade cardíaca. A ação α1 promove vasoconstrição periférica intensa, aumentando a pressão de perfusão coronariana e cerebral durante as compressões.',
+    expectedEffects: [
+      '↑↑ Frequência cardíaca (retorno ao ritmo sinusal)',
+      '↑↑ Pressão arterial',
+      '↑ SpO2',
+      'Vasoconstrição periférica intensa',
+      'Midríase',
+      'Tremor',
+    ],
+    baselineVitals: {
+      heartRate: 10, systolicBP: 45, diastolicBP: 20,
+      respiratoryRate: 4, spO2: 62, temperature: 35.5,
+    },
+    baselineBodyState: {
+      heartRateMultiplier: 0.14, skinVasodilation: -0.6,
+      pupilNormalized: 0.75, bronchialNormalized: 0.9,
+      sweating: 0, salivation: 0, lacrimation: 0,
+      tremor: 0, giMotility: 0.5,
+    },
+  },
 ];
