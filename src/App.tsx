@@ -18,7 +18,7 @@ type MobilePanel = 'farmacos' | 'boneco' | 'vitais';
 
 export default function App() {
   const [started, setStarted]         = useState(false);
-  const [mode, setMode]               = useState<'sim' | 'guia'>('sim');
+  const [mode, setMode]               = useState<'sim' | 'guia' | 'sobre'>('sim');
   const [mobilePanel, setMobilePanel] = useState<MobilePanel>('boneco');
   const [activeDrugs, setActiveDrugs] = useState<ActiveDrug[]>([]);
   const [isLight, setIsLight]         = useState(() => localStorage.getItem('theme') === 'light');
@@ -203,8 +203,9 @@ export default function App() {
         display: 'flex', padding: `0 ${isMobile ? 12 : 24}px`, gap: 4, flexShrink: 0,
       }}>
         {([
-          { id: 'sim',  label: 'Simulação' },
-          { id: 'guia', label: 'Guia de Aprendizado' },
+          { id: 'sim',   label: 'Simulação' },
+          { id: 'guia',  label: 'Guia de Aprendizado' },
+          { id: 'sobre', label: 'Sobre' },
         ] as const).map(tab => (
           <button key={tab.id} onClick={() => setMode(tab.id)} style={{
             background: 'none', border: 'none', cursor: 'pointer',
@@ -221,7 +222,8 @@ export default function App() {
       </div>
 
       {/* ── GUIA ───────────────────────────────────────────── */}
-      {mode === 'guia' && <LearningGuide onSimulateInteraction={handleSimulateInteraction} onSimulateDrug={handleSimulateDrug} />}
+      {mode === 'guia'  && <LearningGuide onSimulateInteraction={handleSimulateInteraction} onSimulateDrug={handleSimulateDrug} />}
+      {mode === 'sobre' && <SobreSection />}
 
       {/* ── SIMULAÇÃO ──────────────────────────────────────── */}
       {mode === 'sim' && (
@@ -330,6 +332,67 @@ export default function App() {
         ::-webkit-scrollbar-thumb:hover { background: #30363d; }
         @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.55;} }
       `}</style>
+    </div>
+  );
+}
+
+function SobreSection() {
+  const techs = [
+    { name: 'React 19',        desc: 'Biblioteca JavaScript para construção de interfaces com componentes reutilizáveis.' },
+    { name: 'TypeScript',      desc: 'Superset do JavaScript com tipagem estática, garantindo segurança durante o desenvolvimento.' },
+    { name: 'Vite',            desc: 'Ferramenta de build moderna com servidor de desenvolvimento ultrarrápido.' },
+    { name: 'Tailwind CSS v4', desc: 'Framework CSS utilitário, configurado diretamente via plugin Vite.' },
+    { name: 'Vercel',          desc: 'Plataforma de hospedagem e deploy contínuo.' },
+    { name: 'GitHub',          desc: 'Versionamento do código-fonte e controle de histórico de mudanças.' },
+  ];
+
+  return (
+    <div style={{ flex: 1, overflowY: 'auto', background: 'var(--bg)', padding: '32px 24px', display: 'flex', justifyContent: 'center' }}>
+      <div style={{ maxWidth: 680, width: '100%', display: 'flex', flexDirection: 'column', gap: 24 }}>
+
+        <div style={{ background: '#111c2b', border: '1px solid #2ecc7133', borderRadius: 14, padding: '24px 28px' }}>
+          <div style={{ fontSize: 11, color: '#2ecc71', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 600, marginBottom: 10 }}>
+            Desenvolvido por
+          </div>
+          <div style={{ fontSize: 22, fontWeight: 700, color: '#e6edf3', marginBottom: 4 }}>Cláudio Rocha</div>
+          <div style={{ fontSize: 13, color: '#8b949e', marginBottom: 16, lineHeight: 1.6 }}>
+            Estudante de Medicina · 3º Período · Turma 158<br/>
+            Universidade Federal de Pernambuco — UFPE
+          </div>
+          <a href="mailto:claudio.filho@ufpe.br" style={{
+            display: 'inline-flex', alignItems: 'center', gap: 8,
+            background: '#2ecc7115', border: '1px solid #2ecc7144',
+            borderRadius: 7, padding: '8px 16px',
+            color: '#2ecc71', fontSize: 13, textDecoration: 'none', fontWeight: 500,
+          }}>
+            claudio.filho@ufpe.br
+          </a>
+        </div>
+
+        <div style={{ background: '#111c2b', border: '1px solid #7fdbff22', borderLeft: '3px solid #7fdbff55', borderRadius: 10, padding: '16px 20px' }}>
+          <div style={{ color: '#7fdbff', fontWeight: 600, fontSize: 13, marginBottom: 8 }}>Sobre o projeto</div>
+          <p style={{ margin: 0, fontSize: 13, color: '#8b949e', lineHeight: 1.8 }}>
+            Este simulador foi desenvolvido como ferramenta de apoio ao estudo da farmacologia do sistema nervoso autônomo,
+            permitindo visualizar de forma interativa os efeitos de fármacos adrenérgicos e colinérgicos no organismo humano.
+            Não substitui o estudo aprofundado nem deve ser utilizado para fins clínicos ou de prescrição médica.
+          </p>
+        </div>
+
+        <div>
+          <p style={{ margin: '0 0 12px', fontSize: 11, color: '#4d6a7a', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 600 }}>
+            Tecnologias utilizadas
+          </p>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+            {techs.map(t => (
+              <div key={t.name} style={{ background: '#111c2b', border: '1px solid #21262d', borderRadius: 8, padding: '12px 14px' }}>
+                <div style={{ color: '#e6edf3', fontWeight: 700, fontSize: 13, marginBottom: 4 }}>{t.name}</div>
+                <p style={{ margin: 0, fontSize: 12, color: '#6b7280', lineHeight: 1.6 }}>{t.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+      </div>
     </div>
   );
 }
