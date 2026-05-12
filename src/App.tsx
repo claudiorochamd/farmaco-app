@@ -66,13 +66,18 @@ export default function App() {
     }
   }, [activeDrugs, scenarioPhase, activeScenario]);
 
-  // Detecção de estado crítico na simulação livre
+  // Detecção de estado crítico — roda sempre que há fármacos ativos
   useEffect(() => {
-    // Só ativa fora de cenário, com fármacos administrados
-    if (scenarioPhase !== 'none' || activeDrugs.length === 0) {
+    // Não checar se já está morto (cenário ou livre)
+    if (freeCritical === 'dead' || scenarioPhase === 'dead') return;
+
+    // Sem fármacos → sem risco de overdose
+    if (activeDrugs.length === 0) {
       if (freeCritical === 'warning') { setFreeCritical('none'); setFreeCriticalTime(20); }
       return;
     }
+
+    // vitals usa sempre a baseline saudável + efeitos dos fármacos
     const critical = getActiveCritical(vitals);
     if (critical) {
       if (freeCritical === 'none') {
@@ -80,14 +85,13 @@ export default function App() {
         setFreeCriticalTime(20);
         setFreeCriticalInfo(critical);
       } else if (freeCritical === 'warning' && critical.id !== freeCriticalInfo?.id) {
-        setFreeCriticalInfo(critical); // atualiza causa se mudou
+        setFreeCriticalInfo(critical);
       }
     } else if (freeCritical === 'warning') {
-      // Vitais voltaram ao normal — salvo!
       setFreeCritical('none');
       setFreeCriticalTime(20);
     }
-  }, [vitals, scenarioPhase, activeDrugs.length]);
+  }, [vitals, activeDrugs.length, freeCritical, freeCriticalInfo?.id, scenarioPhase]);
 
   // Contador do estado crítico livre
   useEffect(() => {
@@ -362,7 +366,7 @@ export default function App() {
       )}
 
       {/* ── BANNER DE ESTADO CRÍTICO LIVRE ────────────────── */}
-      {mode === 'sim' && freeCritical === 'warning' && freeCriticalInfo && (
+      {mode === 'sim' && freeCritical === 'warning' && freeCriticalInfo && scenarioPhase !== 'dead' && (
         <div style={{
           background: 'rgba(231,76,60,0.14)', borderBottom: '2px solid #e74c3c',
           padding: '8px 20px', display: 'flex', alignItems: 'center', gap: 12,
