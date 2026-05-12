@@ -10,7 +10,9 @@ import ActiveDrugsList from './components/ActiveDrugsList';
 import InteractionAlert from './components/InteractionAlert';
 import IntroScreen from './components/IntroScreen';
 import LearningGuide from './components/LearningGuide';
+import ScenariosPanel from './components/ScenariosPanel';
 import { drugs as allDrugs } from './data/drugs';
+import type { Scenario } from './data/scenarios';
 import { useWindowWidth } from './hooks/useWindowWidth';
 
 let idCounter = 0;
@@ -19,7 +21,8 @@ type MobilePanel = 'farmacos' | 'boneco' | 'vitais';
 
 export default function App() {
   const [started, setStarted]         = useState(false);
-  const [mode, setMode]               = useState<'sim' | 'guia' | 'sobre'>('sim');
+  const [mode, setMode]               = useState<'sim' | 'cenarios' | 'guia' | 'sobre'>('sim');
+  const [activeScenario, setActiveScenario] = useState<Scenario | null>(null);
   const [mobilePanel, setMobilePanel] = useState<MobilePanel>('boneco');
   const [activeDrugs, setActiveDrugs] = useState<ActiveDrug[]>([]);
   const [isLight, setIsLight]         = useState(() => localStorage.getItem('theme') === 'light');
@@ -42,11 +45,26 @@ export default function App() {
 
   function handleAdminister(drug: Drug, dose: number) {
     setActiveDrugs(prev => [...prev, { instanceId: `${drug.id}-${++idCounter}`, drug, dose }]);
+    setActiveScenario(null);
   }
   function handleRemove(id: string) {
     setActiveDrugs(prev => prev.filter(d => d.instanceId !== id));
   }
   function handleClearAll() { setActiveDrugs([]); }
+
+  function handleSimulateScenario(scenario: Scenario) {
+    const drugs = scenario.drugs
+      .map(({ drugId, dosePercent }) => {
+        const d = allDrugs.find(drug => drug.id === drugId);
+        if (!d) return null;
+        return { instanceId: `${drugId}-scenario`, drug: d, dose: d.maxDose * dosePercent };
+      })
+      .filter(Boolean) as ActiveDrug[];
+    setActiveDrugs(drugs);
+    setActiveScenario(scenario);
+    setMode('sim');
+    setMobilePanel('boneco');
+  }
 
   function handleSimulateDrug(id: string) {
     const d = allDrugs.find(drug => drug.id === id);
@@ -204,9 +222,10 @@ export default function App() {
         display: 'flex', padding: `0 ${isMobile ? 12 : 24}px`, gap: 4, flexShrink: 0,
       }}>
         {([
-          { id: 'sim',   label: 'Simulação' },
-          { id: 'guia',  label: 'Guia de Aprendizado' },
-          { id: 'sobre', label: 'Sobre' },
+          { id: 'sim',      label: 'Simulação' },
+          { id: 'cenarios', label: 'Cenários Clínicos' },
+          { id: 'guia',     label: 'Guia de Aprendizado' },
+          { id: 'sobre',    label: 'Sobre' },
         ] as const).map(tab => (
           <button key={tab.id} onClick={() => setMode(tab.id)} style={{
             background: 'none', border: 'none', cursor: 'pointer',
@@ -223,8 +242,33 @@ export default function App() {
       </div>
 
       {/* ── GUIA ───────────────────────────────────────────── */}
-      {mode === 'guia'  && <LearningGuide onSimulateInteraction={handleSimulateInteraction} onSimulateDrug={handleSimulateDrug} />}
-      {mode === 'sobre' && <SobreSection />}
+      {mode === 'cenarios' && <ScenariosPanel onSimulate={handleSimulateScenario} />}
+      {mode === 'guia'     && <LearningGuide onSimulateInteraction={handleSimulateInteraction} onSimulateDrug={handleSimulateDrug} />}
+      {mode === 'sobre'    && <SobreSection />}
+
+      {/* ── BANNER DE CENÁRIO ATIVO ────────────────────────── */}
+      {mode === 'sim' && activeScenario && (
+        <div style={{
+          background: `${activeScenario.color}18`,
+          borderBottom: `1px solid ${activeScenario.color}44`,
+          padding: '8px 20px',
+          display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0, flexWrap: 'wrap',
+        }}>
+          <span style={{ fontSize: 11, color: activeScenario.color, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+            Cenário Ativo
+          </span>
+          <span style={{ fontSize: 13, color: '#e6edf3', fontWeight: 600 }}>{activeScenario.title}</span>
+          <span style={{ fontSize: 12, color: '#8b949e' }}>
+            — {activeScenario.drugNames.join(' + ')} administrado(s)
+          </span>
+          <button
+            onClick={() => { setActiveScenario(null); setActiveDrugs([]); }}
+            style={{ marginLeft: 'auto', background: 'none', border: `1px solid ${activeScenario.color}55`, borderRadius: 5, padding: '3px 10px', color: activeScenario.color, fontSize: 11, cursor: 'pointer' }}
+          >
+            Encerrar cenário
+          </button>
+        </div>
+      )}
 
       {/* ── SIMULAÇÃO ──────────────────────────────────────── */}
       {mode === 'sim' && (
