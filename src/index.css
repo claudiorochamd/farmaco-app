@@ -1,15 +1,63 @@
 @import "tailwindcss";
 
+/* ── Variáveis de tema ─────────────────────────────────── */
+:root {
+  --bg:        #0d1117;
+  --bg-2:      #161b22;
+  --bg-3:      #111c2b;
+  --bg-4:      #0d1821;
+  --border:    #21262d;
+  --border-2:  #1e2d3d;
+  --text-1:    #e6edf3;
+  --text-2:    #c9d1d9;
+  --text-3:    #8b949e;
+  --text-4:    #6e7681;
+  --text-5:    #4d6a7a;
+}
+
+html.light {
+  --bg:        #f0f4f8;
+  --bg-2:      #ffffff;
+  --bg-3:      #f6f8fa;
+  --bg-4:      #eef2f6;
+  --border:    #d1d9e0;
+  --border-2:  #c8d3dc;
+  --text-1:    #1f2328;
+  --text-2:    #3d444d;
+  --text-3:    #656d76;
+  --text-4:    #848d97;
+  --text-5:    #57606a;
+}
+
 *, *::before, *::after { box-sizing: border-box; }
 
 html, body, #root {
-  margin: 0;
-  padding: 0;
-  width: 100%;
-  height: 100%;
-  min-height: 100vh;
-  background: #0d1117;
-  color: #c9d1d9;
+  margin: 0; padding: 0;
+  width: 100%; height: 100%; min-height: 100vh;
+  background: var(--bg);
+  color: var(--text-2);
   font-family: "Inter", "Segoe UI", system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
+}
+
+/* ── Scrollbar ─────────────────────────────────────────── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--border-2); }
+
+/* ── Animações globais ─────────────────────────────────── */
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.55; }
+}
+
+@keyframes emergencyRing {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(231,76,60,0); }
+  50%       { box-shadow: 0 0 0 6px rgba(231,76,60,0.5); }
+}
+
+@keyframes emergencyRingYellow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(243,156,18,0); }
+  50%       { box-shadow: 0 0 0 5px rgba(243,156,18,0.45); }
 }

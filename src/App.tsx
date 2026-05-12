@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import type { ActiveDrug, Drug } from './types';
 import { calculateVitals, calculateBodyState } from './utils/pharmacology';
 import { getActiveInteractions } from './data/interactions';
@@ -21,6 +21,12 @@ export default function App() {
   const [mode, setMode]               = useState<'sim' | 'guia'>('sim');
   const [mobilePanel, setMobilePanel] = useState<MobilePanel>('boneco');
   const [activeDrugs, setActiveDrugs] = useState<ActiveDrug[]>([]);
+  const [isLight, setIsLight]         = useState(() => localStorage.getItem('theme') === 'light');
+
+  useEffect(() => {
+    document.documentElement.classList.toggle('light', isLight);
+    localStorage.setItem('theme', isLight ? 'light' : 'dark');
+  }, [isLight]);
 
   const width      = useWindowWidth();
   const isMobile   = width < 700;
@@ -106,8 +112,8 @@ export default function App() {
   return (
     <div style={{
       height: '100dvh',
-      background: '#0d1117',
-      color: '#c9d1d9',
+      background: 'var(--bg)',
+      color: 'var(--text-2)',
       fontFamily: '"Inter","Segoe UI",system-ui,sans-serif',
       display: 'flex',
       flexDirection: 'column',
@@ -168,10 +174,26 @@ export default function App() {
           </>
         )}
 
-        {/* Status */}
-        <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 6 }}>
-          <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#2ecc71', boxShadow: '0 0 6px #2ecc71', display: 'inline-block' }}/>
-          {!isMobile && <span style={{ fontSize: 11, color: '#4d6a7a' }}>Simulação ativa</span>}
+        {/* Status + toggle de tema */}
+        <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 10 }}>
+          {!isMobile && (
+            <span style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 11, color: '#4d6a7a' }}>
+              <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#2ecc71', boxShadow: '0 0 6px #2ecc71', display: 'inline-block' }}/>
+              Simulação ativa
+            </span>
+          )}
+          <button
+            onClick={() => setIsLight(l => !l)}
+            title={isLight ? 'Modo escuro' : 'Modo claro'}
+            style={{
+              background: 'var(--bg-3, #111c2b)', border: '1px solid var(--border, #21262d)',
+              borderRadius: 8, padding: '5px 10px', cursor: 'pointer',
+              color: 'var(--text-4, #6e7681)', fontSize: 13, lineHeight: 1,
+              transition: 'all 0.2s',
+            }}
+          >
+            {isLight ? '🌙' : '☀️'}
+          </button>
         </div>
       </header>
 
@@ -243,7 +265,7 @@ export default function App() {
 
               {/* Active drugs — compact strip */}
               <div style={{
-                background: '#161b22', borderTop: '1px solid #21262d',
+                background: 'var(--bg-2)', borderTop: '1px solid var(--border)',
                 padding: '10px 14px', flexShrink: 0,
                 maxHeight: 130, overflowY: 'auto',
               }}>
@@ -257,7 +279,7 @@ export default function App() {
           {isTablet && (
             <>
               <main style={{ flex: 1, display: 'grid', gridTemplateColumns: '220px 1fr', overflow: 'hidden', minHeight: 0 }}>
-                <aside style={{ background: '#0d1117', borderRight: '1px solid #21262d', padding: '14px 12px', overflowY: 'auto' }}>
+                <aside style={{ background: 'var(--bg)', borderRight: '1px solid var(--border)', padding: '14px 12px', overflowY: 'auto' }}>
                   <DrugPanel onAdminister={handleAdminister} />
                 </aside>
                 <div style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
@@ -269,7 +291,7 @@ export default function App() {
                   </div>
                 </div>
               </main>
-              <footer style={{ background: '#161b22', borderTop: '1px solid #21262d', padding: '12px 20px', flexShrink: 0, maxHeight: interactions.length > 0 ? 300 : 130, overflowY: 'auto' }}>
+              <footer style={{ background: 'var(--bg-2)', borderTop: '1px solid var(--border)', padding: '12px 20px', flexShrink: 0, maxHeight: interactions.length > 0 ? 300 : 130, overflowY: 'auto' }}>
                 <ActiveDrugsList activeDrugs={activeDrugs} onRemove={handleRemove} onClearAll={handleClearAll} />
                 <InteractionAlert interactions={interactions} />
               </footer>
@@ -280,17 +302,17 @@ export default function App() {
           {!isMobile && !isTablet && (
             <>
               <main style={{ flex: 1, display: 'grid', gridTemplateColumns: '270px 1fr 290px', overflow: 'hidden', minHeight: 0 }}>
-                <aside style={{ background: '#0d1117', borderRight: '1px solid #21262d', padding: '16px 14px', overflowY: 'auto' }}>
+                <aside style={{ background: 'var(--bg)', borderRight: '1px solid var(--border)', padding: '16px 14px', overflowY: 'auto' }}>
                   <DrugPanel onAdminister={handleAdminister} />
                 </aside>
                 <section style={{ overflowY: 'auto' }}>
                   {CharacterCenter}
                 </section>
-                <aside style={{ background: '#0d1117', borderLeft: '1px solid #21262d', padding: '16px 14px', overflowY: 'auto' }}>
+                <aside style={{ background: 'var(--bg)', borderLeft: '1px solid var(--border)', padding: '16px 14px', overflowY: 'auto' }}>
                   <VitalSignsPanel vitals={vitals} />
                 </aside>
               </main>
-              <footer style={{ background: '#161b22', borderTop: '1px solid #21262d', padding: '14px 24px', flexShrink: 0, maxHeight: interactions.length > 0 ? 340 : 150, overflowY: 'auto' }}>
+              <footer style={{ background: 'var(--bg-2)', borderTop: '1px solid var(--border)', padding: '14px 24px', flexShrink: 0, maxHeight: interactions.length > 0 ? 340 : 150, overflowY: 'auto' }}>
                 <ActiveDrugsList activeDrugs={activeDrugs} onRemove={handleRemove} onClearAll={handleClearAll} />
                 <InteractionAlert interactions={interactions} />
               </footer>

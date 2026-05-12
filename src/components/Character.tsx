@@ -9,6 +9,21 @@ export default function Character({ bodyState, vitals }: Props) {
   const beatDuration   = Math.round(60000 / vitals.heartRate);
   const breathDuration = Math.round(60000 / vitals.respiratoryRate);
 
+  // Estados de emergência
+  const isTachycardia  = vitals.heartRate  > 150;
+  const isBradycardia  = vitals.heartRate  < 40;
+  const isHypertension = vitals.systolicBP > 180;
+  const isHypoxia      = vitals.spO2       < 90;
+  const isFever        = vitals.temperature > 38.4;
+  const isHypothermia  = vitals.temperature < 35.0;
+  const isEmergency    = isTachycardia || isBradycardia || isHypertension || isHypoxia || isFever;
+  const isWarning      = !isEmergency && (vitals.heartRate > 100 || vitals.heartRate < 60 || vitals.temperature > 37.5);
+
+  // Cor do anel de emergência
+  const ringAnim = isEmergency ? 'emergencyRing 0.9s ease-in-out infinite'
+    : isWarning  ? 'emergencyRingYellow 1.4s ease-in-out infinite'
+    : 'none';
+
   const skinColor  = interpolateColor(bodyState.skinVasodilation);
   const vesselColor = bodyState.skinVasodilation > 0.2
     ? '#e74c3c' : bodyState.skinVasodilation < -0.2 ? '#7f8c8d' : '#c0392b';
@@ -32,12 +47,23 @@ export default function Character({ bodyState, vitals }: Props) {
   const tremorOn = bodyState.tremor      > 0.3;
   const tremorDur = `${(0.11 + (1 - bodyState.tremor) * 0.08).toFixed(3)}s`;
 
+  // Glow do coração escala com FC
+  const heartGlow = isTachycardia
+    ? `drop-shadow(0 0 8px rgba(231,76,60,0.9))`
+    : isBradycardia
+    ? `drop-shadow(0 0 5px rgba(52,152,219,0.7))`
+    : `drop-shadow(0 0 ${3 + bodyState.heartRateMultiplier * 3}px rgba(231,76,60,${0.4 + bodyState.heartRateMultiplier * 0.15}))`;
+
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', position: 'relative' }}>
+    <div style={{
+      display: 'flex', flexDirection: 'column', alignItems: 'center', position: 'relative',
+      borderRadius: 16, animation: ringAnim,
+      padding: 6,
+    }}>
       <style>{`
         @keyframes hb {
-          0%,100%{ transform:scale(1); }
-          12%    { transform:scale(${beatAmp}); }
+          0%,100%{ transform:scale(1); filter:${heartGlow}; }
+          12%    { transform:scale(${beatAmp}); filter:${heartGlow}; }
           26%    { transform:scale(1.02); }
           40%    { transform:scale(${(beatAmp * 0.82).toFixed(3)}); }
           55%    { transform:scale(1); }
@@ -58,8 +84,17 @@ export default function Character({ bodyState, vitals }: Props) {
         .s5{animation:sw 1.6s ease-in .82s infinite;}
         .t1{animation:tf 1.3s ease-in infinite;} .t2{animation:tf 1.3s ease-in .6s infinite;}
         .v1{animation:sl 1.8s ease-in infinite;} .v2{animation:sl 1.8s ease-in .9s infinite;}
-        .hl{animation:${tremorOn?`tr ${tremorDur} linear infinite`:'none'};}
-        .hr{animation:${tremorOn?`tr ${tremorDur} linear infinite`:'none'};animation-delay:.055s;}
+        @keyframes tr2 {
+          0%,100%{transform:translateX(0) translateY(0);}
+          20%{transform:translateX(-${Math.round(bodyState.tremor*5)}px) translateY(1px);}
+          40%{transform:translateX(${Math.round(bodyState.tremor*4)}px) translateY(-1px);}
+          60%{transform:translateX(-${Math.round(bodyState.tremor*3)}px) translateY(2px);}
+          80%{transform:translateX(${Math.round(bodyState.tremor*5)}px) translateY(-2px);}
+        }
+        .hl{animation:${tremorOn?`tr2 ${tremorDur} linear infinite`:'none'};}
+        .hr{animation:${tremorOn?`tr2 ${tremorDur} linear infinite`:'none'};animation-delay:.045s;}
+        .s6{animation:sw 2.1s ease-in .35s infinite;}
+        .s7{animation:sw 1.8s ease-in .7s infinite;}
       `}</style>
 
       <svg viewBox="0 0 300 582" style={{ width: '100%', maxWidth: 255, height: 'auto', overflow: 'visible' }}>
@@ -250,6 +285,23 @@ export default function Character({ bodyState, vitals }: Props) {
         {/* Lips */}
         <path d="M 138,113 C 142,117 148,119 150,119 C 152,119 158,117 162,113" fill="none" stroke="rgba(150,70,70,0.65)" strokeWidth="1.8" strokeLinecap="round"/>
 
+        {/* ── OVERLAYS DE EMERGÊNCIA ────────────────────── */}
+        {isHypoxia && (
+          <rect x="0" y="0" width="300" height="582"
+            fill={`rgba(41,128,185,${Math.min(0.38,(90-vitals.spO2)/18)})`}
+            style={{ pointerEvents:'none', transition:'fill 1s ease' }}/>
+        )}
+        {isFever && (
+          <rect x="0" y="0" width="300" height="582"
+            fill={`rgba(192,57,43,${Math.min(0.30,(vitals.temperature-38.4)/2.5)})`}
+            style={{ pointerEvents:'none', transition:'fill 1s ease' }}/>
+        )}
+        {isHypothermia && (
+          <rect x="0" y="0" width="300" height="582"
+            fill={`rgba(52,152,219,${Math.min(0.28,(35-vitals.temperature)/2)})`}
+            style={{ pointerEvents:'none', transition:'fill 1s ease' }}/>
+        )}
+
         {/* ── SWEAT ─────────────────────────────────────── */}
         {sweatOn && <>
           <ellipse className="s1" cx="93"  cy="185" rx="2.4" ry="3.8" fill="#b3e5fc" opacity="0.85"/>
@@ -257,6 +309,10 @@ export default function Character({ bodyState, vitals }: Props) {
           <ellipse className="s3" cx="207" cy="188" rx="2.4" ry="3.8" fill="#b3e5fc" opacity="0.85"/>
           <ellipse className="s4" cx="227" cy="246" rx="2"   ry="3.4" fill="#b3e5fc" opacity="0.80"/>
           <ellipse className="s5" cx="163" cy="83"  rx="1.9" ry="3"   fill="#b3e5fc" opacity="0.75"/>
+          {bodyState.sweating > 0.6 && <>
+            <ellipse className="s6" cx="108" cy="310" rx="2" ry="3.2" fill="#b3e5fc" opacity="0.75"/>
+            <ellipse className="s7" cx="192" cy="315" rx="2" ry="3.2" fill="#b3e5fc" opacity="0.75"/>
+          </>}
         </>}
 
         {/* ── TEARS ─────────────────────────────────────── */}
@@ -294,17 +350,33 @@ export default function Character({ bodyState, vitals }: Props) {
         </g>
       </svg>
 
-      {/* Pupil status */}
-      <div style={{ fontSize: 11, color: '#8b949e', textAlign: 'center', marginTop: 2 }}>
-        Pupilas:{' '}
-        <span style={{
-          color: bodyState.pupilNormalized < 0.3 ? '#3498db'
-               : bodyState.pupilNormalized > 0.7 ? '#e74c3c'
-               : '#2ecc71',
-          fontWeight: 'bold',
-        }}>
-          {bodyState.pupilNormalized < 0.3 ? 'Miose' : bodyState.pupilNormalized > 0.7 ? 'Midríase' : 'Normal'}
-        </span>
+      {/* Status row */}
+      <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap', marginTop: 4 }}>
+        {/* Temperatura */}
+        <div style={{ fontSize: 11, color: '#8b949e', display: 'flex', alignItems: 'center', gap: 4 }}>
+          <span>Temp:</span>
+          <span style={{
+            fontWeight: 'bold', fontFamily: 'monospace',
+            color: isFever ? '#e74c3c' : isHypothermia ? '#3498db' : vitals.temperature > 37.5 ? '#f39c12' : '#2ecc71',
+          }}>
+            {vitals.temperature.toFixed(1)}°C
+          </span>
+          {isFever        && <span style={{ color: '#e74c3c', fontSize: 10 }}>FEBRE</span>}
+          {isHypothermia  && <span style={{ color: '#3498db', fontSize: 10 }}>HIPOTERMIA</span>}
+        </div>
+
+        {/* Pupilas */}
+        <div style={{ fontSize: 11, color: '#8b949e' }}>
+          Pupilas:{' '}
+          <span style={{
+            fontWeight: 'bold',
+            color: bodyState.pupilNormalized < 0.3 ? '#3498db'
+                 : bodyState.pupilNormalized > 0.7 ? '#e74c3c'
+                 : '#2ecc71',
+          }}>
+            {bodyState.pupilNormalized < 0.3 ? 'Miose' : bodyState.pupilNormalized > 0.7 ? 'Midríase' : 'Normal'}
+          </span>
+        </div>
       </div>
     </div>
   );

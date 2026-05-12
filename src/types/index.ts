@@ -44,6 +44,7 @@ export interface VitalSigns {
   diastolicBP: number;
   respiratoryRate: number;
   spO2: number;
+  temperature: number;
 }
 
 export interface BodyVisualState {

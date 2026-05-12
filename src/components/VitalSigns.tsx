@@ -1,5 +1,5 @@
 import type { VitalSigns } from '../types';
-import { vitalColor } from '../utils/pharmacology';
+import { vitalColor, tempColor } from '../utils/pharmacology';
 import EcgDisplay from './EcgDisplay';
 
 interface Props {
@@ -78,11 +78,23 @@ export default function VitalSignsPanel({ vitals }: Props) {
         bar={{ value: vitals.spO2, min: 60, max: 100 }}
       />
 
-      {vitals.heartRate  > 150 && <Alert text="TAQUICARDIA GRAVE" />}
-      {vitals.heartRate  < 40  && <Alert text="BRADICARDIA GRAVE" />}
-      {vitals.systolicBP > 180 && <Alert text="HIPERTENSÃO GRAVE" />}
-      {vitals.systolicBP < 70  && <Alert text="HIPOTENSÃO GRAVE" />}
-      {vitals.spO2       < 90  && <Alert text="HIPOXEMIA" />}
+      <VitalCard
+        label="Temperatura Corporal"
+        abbr="T°"
+        value={vitals.temperature.toFixed(1)}
+        unit="°C"
+        color={tempColor(vitals.temperature)}
+        normal="36.1–37.2"
+        bar={{ value: vitals.temperature, min: 34, max: 42 }}
+      />
+
+      {vitals.heartRate    > 150 && <Alert text="TAQUICARDIA GRAVE"  color="#e74c3c"/>}
+      {vitals.heartRate    < 40  && <Alert text="BRADICARDIA GRAVE"  color="#e74c3c"/>}
+      {vitals.systolicBP   > 180 && <Alert text="HIPERTENSÃO GRAVE"  color="#e74c3c"/>}
+      {vitals.systolicBP   < 70  && <Alert text="HIPOTENSÃO GRAVE"   color="#e74c3c"/>}
+      {vitals.spO2         < 90  && <Alert text="HIPOXEMIA"           color="#9b59b6"/>}
+      {vitals.temperature  > 38.4 && <Alert text="FEBRE ALTA"        color="#e67e22"/>}
+      {vitals.temperature  < 35.0 && <Alert text="HIPOTERMIA"        color="#3498db"/>}
     </div>
   );
 }
@@ -114,13 +126,13 @@ function VitalCard({ label, abbr, value, unit, color, normal, bar }: {
   );
 }
 
-function Alert({ text }: { text: string }) {
+function Alert({ text, color = '#e74c3c' }: { text: string; color?: string }) {
   return (
     <div style={{
-      background: 'rgba(231,76,60,0.12)', border: '1px solid #e74c3c',
-      borderRadius: 6, padding: '6px 12px', color: '#e74c3c', fontSize: 12,
+      background: `${color}18`, border: `1px solid ${color}`,
+      borderRadius: 6, padding: '6px 12px', color, fontSize: 12,
       fontWeight: 'bold', textAlign: 'center', letterSpacing: '0.05em',
-      animation: 'pulse 1s ease-in-out infinite',
+      animation: 'pulse 0.9s ease-in-out infinite',
     }}>
       ! {text}
     </div>
