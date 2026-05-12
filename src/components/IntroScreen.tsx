@@ -7,7 +7,7 @@ interface Props {
 const FEATURES = [
   {
     title: 'Administre fármacos',
-    desc: 'Selecione o medicamento, ajuste a dose com o slider e clique em Administrar para inserir na corrente sanguínea.',
+    desc: 'Selecione o medicamento, ajuste a dose com o controle deslizante e clique em Administrar para inserir na corrente sanguínea.',
   },
   {
     title: 'Observe o corpo reagir',

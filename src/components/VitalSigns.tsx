@@ -59,10 +59,10 @@ export default function VitalSignsPanel({ vitals }: Props) {
       </div>
 
       <VitalCard
-        label="Freq. Respiratória"
+        label="Frequência Respiratória"
         abbr="FR"
         value={Math.round(vitals.respiratoryRate)}
-        unit="irpm"
+        unit="rpm"
         color={rrColor}
         normal="12–20"
         bar={{ value: vitals.respiratoryRate, min: 0, max: 50 }}

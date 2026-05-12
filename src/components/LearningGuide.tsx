@@ -415,7 +415,7 @@ function AgonAdren() {
       ec: 'Hipertensão arterial, taquicardia, necrose de extremidades (não usar em nariz, dedos — vasoconstrição isquêmica).', color: '#e67e22' },
     { name: 'Norepinefrina (Noradrenalina)', rec: 'α1, α2, β1', sub: 'Catecolamina endógena α/β1',
       mec: 'Agonista α1, α2 e β1; sem ação β2 significativa.',
-      uso: 'Choque séptico (↑ PA, ↓ vasodilatação) e cardiogênico (menor risco de arritmias). CONTRAINDICADA no choque anafilático (sem β2).',
+      uso: 'Choque séptico (↑ PA, ↓ vasodilatação) e cardiogênico (menor risco de arritmias). Contraindicada no choque anafilático (sem β2).',
       ec: 'Hipertensão sistólica e diastólica, necrose de pele e mucosas, bradicardia reflexa (compensada pelo β1).', color: '#e67e22' },
     { name: 'Dopamina', rec: 'D1–D5, β1, α1', sub: 'Catecolamina dose-dependente',
       mec: 'D1/D2 em baixas doses (vasodilatação renal); β1 em doses médias; α1 em altas doses (vasoconstrição).',
@@ -427,7 +427,7 @@ function AgonAdren() {
       ec: 'Agitação, taquicardia, tremores, hiperglicemia, hipopotassemia.', color: '#e67e22' },
     { name: 'Isoproterenol (Isoprelanila)', rec: 'β1, β2', sub: 'Agonista β não seletivo',
       mec: 'Agonista β1 + β2, sem ação α.',
-      uso: 'Bradicardia, bloqueio de ramo, arritmias. CONTRAINDICADO: asma (apesar de broncodilatação, causa isquemia cardíaca) e IC aguda.',
+      uso: 'Bradicardia, bloqueio de ramo, arritmias. Contraindicado: asma (apesar de broncodilatação, causa isquemia cardíaca) e IC aguda.',
       ec: 'Taquicardia, agitação, nervosismo, hiperglicemia, hipopotassemia, hipotensão periférica.', color: '#e67e22' },
     { name: 'Salbutamol (Albuterol / Aerolin)', rec: 'β2 (seletivo)', sub: 'Agonista β2 — curta ação (4–6h)',
       mec: 'Agonista β2 seletivo; início de ação: 5–8 min.',
@@ -470,15 +470,15 @@ function BloqAdren() {
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
         {[
           { name: 'Fenoxibenzamina', rec: 'α1 + α2', type: 'Não seletivo — IRREVERSÍVEL',
-            uso: 'Feocromocitoma (↓ PA por inibição da vasoconstrição). EC: taquicardia reflexa, hipotensão postural, congestão nasal.' },
+            uso: 'Feocromocitoma (↓ PA por inibição da vasoconstrição). Efeitos colaterais:taquicardia reflexa, hipotensão postural, congestão nasal.' },
           { name: 'Fentolamina', rec: 'α1 + α2', type: 'Não seletivo — REVERSÍVEL',
-            uso: 'Feocromocitoma, disfunção erétil. EC: compartilha com fenoxibenzamina.' },
+            uso: 'Feocromocitoma, disfunção erétil. Efeitos colaterais:compartilha com fenoxibenzamina.' },
           { name: 'Prazosina', rec: 'α1 (todos subtipos)', type: 'α1 seletivo',
-            uso: 'HAS, Hiperplasia Prostática Benigna (HPB). EC: síncope na 1ª dose, taquicardia reflexa, hipotensão ortostática.' },
+            uso: 'HAS, Hiperplasia Prostática Benigna (HPB). Efeitos colaterais:síncope na 1ª dose, taquicardia reflexa, hipotensão ortostática.' },
           { name: 'Terazosina', rec: 'α1', type: 'α1 seletivo',
-            uso: 'HPB + HAS. Não urosseletiva. EC: semelhante à prazosina.' },
+            uso: 'HPB + HAS. Não urosseletiva. Efeitos colaterais:semelhante à prazosina.' },
           { name: 'Doxazosina', rec: 'α1', type: 'α1 seletivo (análogo da prazosina)',
-            uso: 'HPB + HAS. EC: semelhante à prazosina.' },
+            uso: 'HPB + HAS. Efeitos colaterais:semelhante à prazosina.' },
           { name: 'Tansulosina', rec: 'α1A (próstata)', type: 'α1A seletivo — UROSSELETIVO',
             uso: 'HPB. Menos efeitos cardiovasculares.' },
           { name: 'Silodosina', rec: 'α1A (próstata)', type: 'α1A seletivo — UROSSELETIVO',
@@ -529,7 +529,7 @@ function BloqAdren() {
           gen: '3ª Geração β não seletivos — com ações adicionais', color: '#e67e22',
           drugs: [
             { name: 'Labetalol', detail: 'Bloqueia α1 + β1 + β2 (ASI β2). Vasodilatação + ↓ broncoconstrição. HAS leve a moderada, HAS do parto, emergências hipertensivas. Não usar em asmáticos.' },
-            { name: 'Carvedilol', detail: 'Bloqueia α1 + β (sem ASI). Antioxidante. ICC crônica (↓ mortalidade). EC: broncoconstrição, bradicardia, hipoglicemia.' },
+            { name: 'Carvedilol', detail: 'Bloqueia α1 + β (sem ASI). Antioxidante. ICC crônica (↓ mortalidade). Efeitos colaterais:broncoconstrição, bradicardia, hipoglicemia.' },
             { name: 'Bucindolol', detail: 'Fraca ação α1 + ASI em β1. Menor bradicardia. ICC.' },
             { name: 'Carteolol', detail: 'ASI em β2. Hipotensor ocular, produz NO.' },
           ],
@@ -625,9 +625,9 @@ function AgonColin() {
               </Pill>
             </div>
           </div>
-          <p style={{ margin: '0 0 4px', fontSize: 12, color: '#8b949e', lineHeight: 1.5 }}><strong style={{ color: '#c9d1d9' }}>Mec:</strong> {drug.mec}</p>
-          <p style={{ margin: '0 0 4px', fontSize: 12, color: '#8b949e', lineHeight: 1.5 }}><strong style={{ color: '#2ecc71' }}>Uso:</strong> {drug.uso}</p>
-          <p style={{ margin: 0, fontSize: 12, color: '#8b949e', lineHeight: 1.5 }}><strong style={{ color: '#e74c3c' }}>EC:</strong> {drug.ec}</p>
+          <p style={{ margin: '0 0 4px', fontSize: 12, color: '#8b949e', lineHeight: 1.5 }}><strong style={{ color: '#c9d1d9' }}>Mecanismo:</strong> {drug.mec}</p>
+          <p style={{ margin: '0 0 4px', fontSize: 12, color: '#8b949e', lineHeight: 1.5 }}><strong style={{ color: '#2ecc71' }}>Uso clínico:</strong> {drug.uso}</p>
+          <p style={{ margin: 0, fontSize: 12, color: '#8b949e', lineHeight: 1.5 }}><strong style={{ color: '#e74c3c' }}>Efeitos colaterais:</strong> {drug.ec}</p>
         </div>
       ))}
     </div>
@@ -658,7 +658,7 @@ function BloqColin() {
       uso: 'DPOC (manutenção).', ec: 'Boca seca.', color: '#8e44ad', bhe: 'Não atravessa BHE' },
     { name: 'Pirenzepina', rec: 'M1 (seletivo)', sub: 'Amina terciária — antipéptico',
       mec: 'Bloqueia M1 gástrico → inibe liberação de HCl.',
-      uso: 'Úlcera péptica, gastrite hiperácida.', ec: 'Boca seca, visão embaçada (menos que atropina).', color: '#8e44ad', bhe: 'Atravessa BHE (mas menos) ' },
+      uso: 'Úlcera péptica, gastrite hiperácida.', ec: 'Boca seca, visão embaçada (menos que atropina).', color: '#8e44ad', bhe: 'Atravessa BHE (em menor grau)' },
     { name: 'Tropicamida', rec: 'M3 (olho)', sub: 'Amina terciária — midriático',
       mec: 'Bloqueia M3 → midríase + cicloplegia (paralisia do M. ciliar). Curta duração.',
       uso: 'Exame de fundo de olho, refração.', ec: 'Midríase, cicloplegia, visão turva temporária.', color: '#8e44ad', bhe: 'Atravessa BHE' },
@@ -700,9 +700,9 @@ function BloqColin() {
               <Pill color={drug.bhe.startsWith('Não') ? '#e74c3c' : '#2ecc71'}>{drug.bhe}</Pill>
             </div>
           </div>
-          <p style={{ margin: '0 0 4px', fontSize: 12, color: '#8b949e', lineHeight: 1.5 }}><strong style={{ color: '#c9d1d9' }}>Mec:</strong> {drug.mec}</p>
-          <p style={{ margin: '0 0 4px', fontSize: 12, color: '#8b949e', lineHeight: 1.5 }}><strong style={{ color: '#2ecc71' }}>Uso:</strong> {drug.uso}</p>
-          <p style={{ margin: 0, fontSize: 12, color: '#8b949e', lineHeight: 1.5 }}><strong style={{ color: '#e74c3c' }}>EC:</strong> {drug.ec}</p>
+          <p style={{ margin: '0 0 4px', fontSize: 12, color: '#8b949e', lineHeight: 1.5 }}><strong style={{ color: '#c9d1d9' }}>Mecanismo:</strong> {drug.mec}</p>
+          <p style={{ margin: '0 0 4px', fontSize: 12, color: '#8b949e', lineHeight: 1.5 }}><strong style={{ color: '#2ecc71' }}>Uso clínico:</strong> {drug.uso}</p>
+          <p style={{ margin: 0, fontSize: 12, color: '#8b949e', lineHeight: 1.5 }}><strong style={{ color: '#e74c3c' }}>Efeitos colaterais:</strong> {drug.ec}</p>
         </div>
       ))}
     </div>
@@ -779,9 +779,9 @@ function DrugList({ items }: { items: Array<{ name: string; rec: string; sub: st
             </div>
             <Pill color={drug.color}>{drug.rec}</Pill>
           </div>
-          <p style={{ margin: '0 0 4px', fontSize: 12, color: '#8b949e', lineHeight: 1.5 }}><strong style={{ color: '#c9d1d9' }}>Mec:</strong> {drug.mec}</p>
-          <p style={{ margin: '0 0 4px', fontSize: 12, color: '#8b949e', lineHeight: 1.5 }}><strong style={{ color: '#2ecc71' }}>Uso:</strong> {drug.uso}</p>
-          <p style={{ margin: 0, fontSize: 12, color: '#8b949e', lineHeight: 1.5 }}><strong style={{ color: '#e74c3c' }}>EC:</strong> {drug.ec}</p>
+          <p style={{ margin: '0 0 4px', fontSize: 12, color: '#8b949e', lineHeight: 1.5 }}><strong style={{ color: '#c9d1d9' }}>Mecanismo:</strong> {drug.mec}</p>
+          <p style={{ margin: '0 0 4px', fontSize: 12, color: '#8b949e', lineHeight: 1.5 }}><strong style={{ color: '#2ecc71' }}>Uso clínico:</strong> {drug.uso}</p>
+          <p style={{ margin: 0, fontSize: 12, color: '#8b949e', lineHeight: 1.5 }}><strong style={{ color: '#e74c3c' }}>Efeitos colaterais:</strong> {drug.ec}</p>
         </div>
       ))}
     </div>

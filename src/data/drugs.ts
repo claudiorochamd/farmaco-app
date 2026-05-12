@@ -7,7 +7,7 @@ export const drugs: Drug[] = [
     name: 'Epinefrina',
     genericName: 'Adrenalina',
     class: 'agonista_adrenergico',
-    subclass: 'Catecolamina não-seletiva',
+    subclass: 'Catecolamina não seletiva',
     receptors: ['α1', 'α2', 'β1', 'β2'],
     mechanism: 'Agonista direto de receptores α e β adrenérgicos',
     effects: {
@@ -157,9 +157,9 @@ export const drugs: Drug[] = [
     name: 'Isoproterenol',
     genericName: 'Isoprenalina',
     class: 'agonista_adrenergico',
-    subclass: 'Agonista β1/β2 não-seletivo',
+    subclass: 'Agonista β1/β2 não seletivo',
     receptors: ['β1', 'β2'],
-    mechanism: 'Agonista β não-seletivo; sem atividade α',
+    mechanism: 'Agonista β não seletivo; sem atividade α',
     effects: {
       heartRate: 52,
       systolicBP: 18,
@@ -209,9 +209,9 @@ export const drugs: Drug[] = [
     name: 'Propranolol',
     genericName: 'Propranolol',
     class: 'bloqueador_adrenergico',
-    subclass: 'Bloqueador β não-seletivo',
+    subclass: 'Bloqueador β não seletivo',
     receptors: ['β1', 'β2'],
-    mechanism: 'Antagonista β1 e β2; reduz FC, contratilidade e broncoconstricção',
+    mechanism: 'Antagonista β1 e β2; reduz FC, contratilidade e broncoconstrição',
     effects: {
       heartRate: -28,
       systolicBP: -18,
@@ -284,7 +284,7 @@ export const drugs: Drug[] = [
     name: 'Fentolamina',
     genericName: 'Fentolamina',
     class: 'bloqueador_adrenergico',
-    subclass: 'Bloqueador α não-seletivo',
+    subclass: 'Bloqueador α não seletivo',
     receptors: ['α1', 'α2'],
     mechanism: 'Antagonista α1 e α2; causa vasodilatação e taquicardia reflexa',
     effects: {
@@ -388,7 +388,7 @@ export const drugs: Drug[] = [
     class: 'agonista_colinergico',
     subclass: 'Agonista muscarínico',
     receptors: ['M1', 'M2', 'M3'],
-    mechanism: 'Agonista muscarínico não-seletivo; muito usado em oftalmologia',
+    mechanism: 'Agonista muscarínico não seletivo; muito usado em oftalmologia',
     effects: {
       heartRate: -28,
       systolicBP: -18,
@@ -513,9 +513,9 @@ export const drugs: Drug[] = [
     name: 'Atropina',
     genericName: 'Atropina',
     class: 'bloqueador_colinergico',
-    subclass: 'Antimuscarínico não-seletivo',
+    subclass: 'Antimuscarínico não seletivo',
     receptors: ['M1', 'M2', 'M3'],
-    mechanism: 'Antagonista muscarínico não-seletivo; bloqueia todos efeitos parassimpáticos',
+    mechanism: 'Antagonista muscarínico não seletivo; bloqueia todos efeitos parassimpáticos',
     effects: {
       heartRate: 32,
       systolicBP: 12,

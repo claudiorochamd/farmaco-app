@@ -131,8 +131,8 @@ export default function DrugPanel({ onAdminister }: Props) {
               style={{ width: '100%', accentColor: info.color }}
             />
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 9, color: '#555' }}>
-              <span>Min</span>
-              <span>Max: {selectedDrug.maxDose} {selectedDrug.unit}</span>
+              <span>Mín</span>
+              <span>Máx: {selectedDrug.maxDose} {selectedDrug.unit}</span>
             </div>
           </div>
 

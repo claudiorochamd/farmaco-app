@@ -126,7 +126,7 @@ export default function EcgDisplay({ heartRate, spO2 }: Props) {
       <canvas ref={canvasRef} width={ECG_WIDTH} height={ECG_HEIGHT} style={{ display: 'block', width: '100%', height: ECG_HEIGHT }}/>
       <div style={{ position: 'absolute', top: 6, right: 10, display: 'flex', gap: 16, fontSize: 12 }}>
         <span style={{ color: hrColor, fontFamily: 'monospace', fontWeight: 'bold' }}>
-          FC  {Math.round(heartRate)} bpm
+          FC {Math.round(heartRate)} bpm
         </span>
         <span style={{ color: spO2Color, fontFamily: 'monospace', fontWeight: 'bold' }}>
           SpO₂ {spO2.toFixed(0)}%
