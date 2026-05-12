@@ -13,6 +13,7 @@ import LearningGuide from './components/LearningGuide';
 import ScenariosPanel from './components/ScenariosPanel';
 import { drugs as allDrugs } from './data/drugs';
 import type { Scenario } from './data/scenarios';
+import { getActiveCritical, type CriticalThreshold } from './data/thresholds';
 import { useWindowWidth } from './hooks/useWindowWidth';
 
 let idCounter = 0;
@@ -25,6 +26,11 @@ export default function App() {
   const [activeScenario, setActiveScenario] = useState<Scenario | null>(null);
   const [scenarioPhase, setScenarioPhase]   = useState<'none' | 'active' | 'solved' | 'dead'>('none');
   const [timeLeft, setTimeLeft]             = useState(60);
+
+  // Estado crítico na simulação livre
+  const [freeCritical, setFreeCritical]     = useState<'none' | 'warning' | 'dead'>('none');
+  const [freeCriticalTime, setFreeCriticalTime] = useState(20);
+  const [freeCriticalInfo, setFreeCriticalInfo] = useState<CriticalThreshold | null>(null);
   const [mobilePanel, setMobilePanel] = useState<MobilePanel>('boneco');
   const [activeDrugs, setActiveDrugs] = useState<ActiveDrug[]>([]);
   const [isLight, setIsLight]         = useState(() => localStorage.getItem('theme') === 'light');
@@ -59,6 +65,37 @@ export default function App() {
       setScenarioPhase('solved');
     }
   }, [activeDrugs, scenarioPhase, activeScenario]);
+
+  // Detecção de estado crítico na simulação livre
+  useEffect(() => {
+    // Só ativa fora de cenário, com fármacos administrados
+    if (scenarioPhase !== 'none' || activeDrugs.length === 0) {
+      if (freeCritical === 'warning') { setFreeCritical('none'); setFreeCriticalTime(20); }
+      return;
+    }
+    const critical = getActiveCritical(vitals);
+    if (critical) {
+      if (freeCritical === 'none') {
+        setFreeCritical('warning');
+        setFreeCriticalTime(20);
+        setFreeCriticalInfo(critical);
+      } else if (freeCritical === 'warning' && critical.id !== freeCriticalInfo?.id) {
+        setFreeCriticalInfo(critical); // atualiza causa se mudou
+      }
+    } else if (freeCritical === 'warning') {
+      // Vitais voltaram ao normal — salvo!
+      setFreeCritical('none');
+      setFreeCriticalTime(20);
+    }
+  }, [vitals, scenarioPhase, activeDrugs.length]);
+
+  // Contador do estado crítico livre
+  useEffect(() => {
+    if (freeCritical !== 'warning') return;
+    if (freeCriticalTime <= 0) { setFreeCritical('dead'); return; }
+    const t = setTimeout(() => setFreeCriticalTime(p => p - 1), 1000);
+    return () => clearTimeout(t);
+  }, [freeCritical, freeCriticalTime]);
 
   // Vitals e bodyState exibidos (usa baseline quando fase ativa + sem fármacos)
   const displayVitals = (scenarioPhase !== 'none' && activeDrugs.length === 0 && activeScenario)
@@ -124,7 +161,7 @@ export default function App() {
   }
 
   // ── Reutilizável: centro com boneco ───────────────────────────────────────
-  const isDead = scenarioPhase === 'dead';
+  const isDead = scenarioPhase === 'dead' || freeCritical === 'dead';
 
   const CharacterCenter = (
     <div style={{
@@ -324,12 +361,73 @@ export default function App() {
         </div>
       )}
 
+      {/* ── BANNER DE ESTADO CRÍTICO LIVRE ────────────────── */}
+      {mode === 'sim' && freeCritical === 'warning' && freeCriticalInfo && (
+        <div style={{
+          background: 'rgba(231,76,60,0.14)', borderBottom: '2px solid #e74c3c',
+          padding: '8px 20px', display: 'flex', alignItems: 'center', gap: 12,
+          flexShrink: 0, flexWrap: 'wrap',
+          animation: 'pulse 0.8s ease-in-out infinite',
+        }}>
+          <span style={{ fontWeight: 800, color: '#e74c3c', fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+            Estado Crítico
+          </span>
+          <span style={{ fontSize: 12, color: '#e6edf3', flex: 1 }}>
+            {freeCriticalInfo.cause.split('(')[0].trim()}
+          </span>
+          <span style={{
+            fontFamily: 'monospace', fontWeight: 800, fontSize: 16, color: '#e74c3c',
+            animation: freeCriticalTime <= 10 ? 'pulse 0.5s ease-in-out infinite' : 'none',
+          }}>
+            {freeCriticalTime}s
+          </span>
+          <span style={{ fontSize: 11, color: '#8b949e' }}>para reverter</span>
+        </div>
+      )}
+
       {/* ── SIMULAÇÃO ──────────────────────────────────────── */}
       {mode === 'sim' && (
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', minHeight: 0, position: 'relative' }}>
 
-        {/* Tela de óbito */}
-        {isDead && activeScenario && (
+        {/* ── Tela de óbito — simulação livre ── */}
+        {freeCritical === 'dead' && freeCriticalInfo && (
+          <div style={{
+            position: 'absolute', inset: 0, zIndex: 50,
+            background: 'rgba(0,0,0,0.90)', backdropFilter: 'blur(6px)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24,
+          }}>
+            <div style={{ textAlign: 'center', maxWidth: 460 }}>
+              <svg width="200" height="40" viewBox="0 0 200 40" style={{ display: 'block', margin: '0 auto 20px' }}>
+                <line x1="0" y1="20" x2="200" y2="20" stroke="#e74c3c" strokeWidth="2" opacity="0.7" strokeDasharray="4 4"/>
+              </svg>
+              <div style={{ fontSize: 26, fontWeight: 800, color: '#e6edf3', marginBottom: 14, letterSpacing: '-0.01em' }}>
+                Claudinho veio à óbito.
+              </div>
+
+              {/* Causa */}
+              <div style={{ background: 'rgba(231,76,60,0.1)', border: '1px solid #e74c3c44', borderRadius: 8, padding: '12px 16px', marginBottom: 14, textAlign: 'left' }}>
+                <div style={{ fontSize: 10, color: '#e74c3c', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 700, marginBottom: 4 }}>Causa do óbito</div>
+                <div style={{ fontSize: 13, color: '#e6edf3', lineHeight: 1.6 }}>{freeCriticalInfo.cause}</div>
+              </div>
+
+              {/* Como evitar */}
+              <div style={{ background: 'rgba(52,152,219,0.08)', border: '1px solid #3498db44', borderRadius: 8, padding: '12px 16px', marginBottom: 24, textAlign: 'left' }}>
+                <div style={{ fontSize: 10, color: '#3498db', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 700, marginBottom: 4 }}>Como teria evitado</div>
+                <div style={{ fontSize: 13, color: '#c9d1d9', lineHeight: 1.7 }}>{freeCriticalInfo.avoidance}</div>
+              </div>
+
+              <button
+                onClick={() => { setActiveDrugs([]); setFreeCritical('none'); setFreeCriticalTime(20); setFreeCriticalInfo(null); }}
+                style={{ background: '#2ecc71', border: 'none', borderRadius: 8, padding: '10px 28px', color: '#fff', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}
+              >
+                Tentar novamente
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* ── Tela de óbito — cenário ── */}
+        {isDead && activeScenario && scenarioPhase === 'dead' && (
           <div style={{
             position: 'absolute', inset: 0, zIndex: 50,
             background: 'rgba(0,0,0,0.90)',
