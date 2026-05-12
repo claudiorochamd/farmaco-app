@@ -7,6 +7,11 @@ export interface ScenarioDrug {
   dosePercent: number;
 }
 
+export interface ScenarioHint {
+  atTimeLeft: number; // aparece quando timeLeft ≤ este valor
+  text: string;
+}
+
 export interface Scenario {
   id: string;
   title: string;
@@ -19,6 +24,7 @@ export interface Scenario {
   expectedEffects: string[];
   baselineVitals: VitalSigns;
   baselineBodyState: BodyVisualState;
+  hints: ScenarioHint[];
 }
 
 export const scenarios: Scenario[] = [
@@ -51,6 +57,11 @@ export const scenarios: Scenario[] = [
       sweating: 0.4, salivation: 0.1, lacrimation: 0.1,
       tremor: 0.2, giMotility: 1.0,
     },
+    hints: [
+      { atTimeLeft: 40, text: 'Observe a SpO2 e a PA — o que está acontecendo com o paciente?' },
+      { atTimeLeft: 25, text: 'Broncoespasmo + hipotensão simultâneos sugerem uma reação anafilática. Qual fármaco é o antagonista fisiológico da histamina?' },
+      { atTimeLeft: 10, text: 'Administre Epinefrina — ela atua em α1 (↑PA), β1 (↑FC) e β2 (broncodilatação) ao mesmo tempo.' },
+    ],
   },
   {
     id: 'bradicardia',
@@ -80,6 +91,11 @@ export const scenarios: Scenario[] = [
       sweating: 0.1, salivation: 0, lacrimation: 0,
       tremor: 0, giMotility: 1.0,
     },
+    hints: [
+      { atTimeLeft: 40, text: 'FC muito baixa — qual sistema está freando o coração em excesso?' },
+      { atTimeLeft: 25, text: 'O tônus parassimpático excessivo (vagal) está causando a bradicardia. Qual receptor muscarínico no coração precisa ser bloqueado?' },
+      { atTimeLeft: 10, text: 'Administre Atropina — bloqueia o receptor M2 e remove o freio vagal sobre o nó SA.' },
+    ],
   },
   {
     id: 'hipertensao',
@@ -108,6 +124,11 @@ export const scenarios: Scenario[] = [
       sweating: 0.2, salivation: 0, lacrimation: 0,
       tremor: 0.1, giMotility: 1.0,
     },
+    hints: [
+      { atTimeLeft: 40, text: 'PA extremamente elevada — risco iminente de AVC. Qual sistema está excessivamente ativado?' },
+      { atTimeLeft: 25, text: 'Crise hipertensiva requer redução rápida e controlada da PA. Evite beta-bloqueadores isolados — procure um bloqueador α + β.' },
+      { atTimeLeft: 10, text: 'Administre Labetalol — bloqueia α1 (vasodilatação) e β simultaneamente, reduzindo PA sem taquicardia reflexa.' },
+    ],
   },
   {
     id: 'asma',
@@ -136,6 +157,11 @@ export const scenarios: Scenario[] = [
       sweating: 0.5, salivation: 0, lacrimation: 0.1,
       tremor: 0.2, giMotility: 1.0,
     },
+    hints: [
+      { atTimeLeft: 40, text: 'SpO2 baixa e brônquios constrictos — há broncoespasmo ativo. Qual classe de receptor o reverte?' },
+      { atTimeLeft: 25, text: 'Receptor β2 nos brônquios promove broncodilatação. Procure um agonista β2 seletivo de curta ação.' },
+      { atTimeLeft: 10, text: 'Administre Salbutamol — agonista β2 com início de ação em 5–8 minutos e mínimo efeito cardíaco.' },
+    ],
   },
   {
     id: 'sepse',
@@ -164,6 +190,11 @@ export const scenarios: Scenario[] = [
       sweating: 0.65, salivation: 0, lacrimation: 0,
       tremor: 0.1, giMotility: 0.7,
     },
+    hints: [
+      { atTimeLeft: 40, text: 'Paciente em choque — PA colapsada por vasodilatação sistêmica. Qual sistema precisa ser estimulado para contrair os vasos?' },
+      { atTimeLeft: 25, text: 'No choque séptico, o receptor α1 vascular está sub-estimulado. Procure um vasopressor com potente ação α1.' },
+      { atTimeLeft: 10, text: 'Administre Norepinefrina — primeira linha no choque séptico pela sua potente ação α1 vasoconstritora.' },
+    ],
   },
   {
     id: 'organofosforado',
@@ -194,6 +225,11 @@ export const scenarios: Scenario[] = [
       sweating: 1.0, salivation: 1.0, lacrimation: 0.9,
       tremor: 0.3, giMotility: 2.5,
     },
+    hints: [
+      { atTimeLeft: 40, text: 'Síndrome SLUDGE presente: sialorreia, lacrimejamento, miose, broncoespasmo, bradicardia. Qual neurotransmissor está em excesso?' },
+      { atTimeLeft: 25, text: 'Acetilcolina acumulada nas sinapses muscarínicas. Qual fármaco bloqueia esses receptores e reverte todos esses efeitos?' },
+      { atTimeLeft: 10, text: 'Administre Atropina — bloqueia receptores M2 (↑FC) e M3 (broncodilatação, ↓secreções). É o antídoto padrão da crise colinérgica.' },
+    ],
   },
   {
     id: 'pcr',
@@ -224,5 +260,10 @@ export const scenarios: Scenario[] = [
       sweating: 0, salivation: 0, lacrimation: 0,
       tremor: 0, giMotility: 0.5,
     },
+    hints: [
+      { atTimeLeft: 40, text: 'FC quase zero — assistolia. O coração precisa de estimulação adrenérgica urgente para retomar o automatismo.' },
+      { atTimeLeft: 25, text: 'Protocolo ACLS: qual é o único fármaco vasoativo recomendado na PCR? Pense em α1 (perfusão coronariana) + β1 (automatismo).' },
+      { atTimeLeft: 10, text: 'Administre Epinefrina — dose máxima. É o único vasoativo do protocolo de RCP: aumenta a pressão de perfusão coronariana durante as compressões.' },
+    ],
   },
 ];

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { scenarios, type Scenario } from '../data/scenarios';
 import { useWindowWidth } from '../hooks/useWindowWidth';
+import SessionHistory from './SessionHistory';
 
 const SEV_LABEL: Record<string, string> = {
   critical: 'Emergência',
@@ -14,11 +15,35 @@ interface Props {
 
 export default function ScenariosPanel({ onSimulate }: Props) {
   const [selected, setSelected] = useState<Scenario | null>(null);
+  const [tab, setTab]           = useState<'cenarios' | 'historico'>('cenarios');
   const width    = useWindowWidth();
   const isMobile = width < 700;
 
   return (
-    <div style={{ flex: 1, overflowY: 'auto', background: 'var(--bg)', padding: isMobile ? '16px 12px' : '28px 28px' }}>
+    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+      {/* Tabs */}
+      <div style={{ display: 'flex', background: 'var(--bg)', borderBottom: '1px solid var(--border)', padding: '0 28px', flexShrink: 0 }}>
+        {(['cenarios', 'historico'] as const).map(t => (
+          <button key={t} onClick={() => setTab(t)} style={{
+            background: 'none', border: 'none', cursor: 'pointer',
+            padding: '10px 16px', fontSize: 13,
+            color: tab === t ? '#e6edf3' : '#6b7280',
+            fontWeight: tab === t ? 600 : 400,
+            borderBottom: `2px solid ${tab === t ? '#2ecc71' : 'transparent'}`,
+            marginBottom: -1, transition: 'all 0.15s',
+          }}>
+            {t === 'cenarios' ? 'Cenários Clínicos' : 'Histórico de Sessão'}
+          </button>
+        ))}
+      </div>
+
+      {tab === 'historico' && (
+        <div style={{ flex: 1, overflowY: 'auto', background: 'var(--bg)', padding: isMobile ? '16px 12px' : '24px 28px' }}>
+          <SessionHistory />
+        </div>
+      )}
+
+      {tab === 'cenarios' && <div style={{ flex: 1, overflowY: 'auto', background: 'var(--bg)', padding: isMobile ? '16px 12px' : '28px 28px' }}>
       <div style={{ maxWidth: 900, margin: '0 auto' }}>
 
         {/* Header */}
@@ -139,6 +164,7 @@ export default function ScenariosPanel({ onSimulate }: Props) {
         )}
 
       </div>
+      </div>}  {/* fecha tab cenarios */}
     </div>
   );
 }

@@ -4,9 +4,10 @@ interface Props {
   bodyState: BodyVisualState;
   vitals: VitalSigns;
   isDead?: boolean;
+  onOrganClick?: (organ: 'heart' | 'lungs' | 'eyes') => void;
 }
 
-export default function Character({ bodyState, vitals, isDead = false }: Props) {
+export default function Character({ bodyState, vitals, isDead = false, onOrganClick }: Props) {
   const beatDuration   = Math.round(60000 / vitals.heartRate);
   const breathDuration = Math.round(60000 / vitals.respiratoryRate);
 
@@ -200,7 +201,7 @@ export default function Character({ bodyState, vitals, isDead = false }: Props) 
         <path d="M 153,398 C 162,408 176,416 192,424" fill="none" stroke={vesselColor} strokeWidth={Math.max(0.5, vesselWidth - 0.5)} opacity="0.6"/>
 
         {/* ── LUNGS ─────────────────────────────────────── */}
-        <g className="lg">
+        <g className="lg" onClick={() => onOrganClick?.('lungs')} style={{ cursor: onOrganClick ? 'pointer' : 'default' }}>
           <path d="M 112,222 C 92,220 82,237 80,259 C 78,281 80,307 90,323 C 98,336 110,340 120,334 C 130,326 134,308 134,283 C 134,259 128,226 112,222 Z"
                 fill={lungFill} stroke={lungStroke} strokeWidth="1.3"/>
           <path d="M 96,238 C 88,245 86,259 90,270" fill="none" stroke="rgba(255,200,200,0.28)" strokeWidth="2" strokeLinecap="round"/>
@@ -214,7 +215,7 @@ export default function Character({ bodyState, vitals, isDead = false }: Props) 
         </g>
 
         {/* ── HEART ─────────────────────────────────────── */}
-        <g className="hg" filter="url(#gl)">
+        <g className="hg" filter="url(#gl)" onClick={() => onOrganClick?.('heart')} style={{ cursor: onOrganClick ? 'pointer' : 'default' }}>
           <path d="M 148,270 C 148,270 118,253 118,234 C 118,218 130,213 138,218 C 142,221 146,227 148,234 C 150,227 154,221 158,218 C 166,213 178,218 178,234 C 178,253 148,270 148,270 Z"
                 fill="url(#hg2)" stroke="#7b241c" strokeWidth="1.3"/>
           <path d="M 153,220 C 155,212 157,206 155,201 C 153,196 148,196 146,201 C 144,206 146,212 148,220"
@@ -284,7 +285,7 @@ export default function Character({ bodyState, vitals, isDead = false }: Props) 
           </>
         ) : (
           /* === OLHOS NORMAIS === */
-          <>
+          <g onClick={() => onOrganClick?.('eyes')} style={{ cursor: onOrganClick ? 'pointer' : 'default' }}>
             {/* Olho esquerdo */}
             <ellipse cx="122" cy="74" rx="14" ry="10" fill="white" stroke="rgba(0,0,0,0.18)" strokeWidth="0.8"/>
             <circle cx="122" cy="75" r={irisR} fill="#7a4a1a" clipPath="url(#cl)"/>
@@ -307,7 +308,7 @@ export default function Character({ bodyState, vitals, isDead = false }: Props) 
             <path d="M 164,74 C 168,63 188,63 192,74" fill="none" stroke="rgba(0,0,0,0.32)" strokeWidth="1.2"/>
             <ellipse cx="178" cy="74" rx="14" ry="10" fill="none" stroke="rgba(0,0,0,0.22)" strokeWidth="1"/>
             <path d="M 166,79 C 174,82 182,82 190,79" fill="none" stroke="rgba(0,0,0,0.15)" strokeWidth="0.8"/>
-          </>
+          </g>
         )}
         {/* Nose */}
         <path d="M 150,85 C 146,91 144,97 147,102 C 150,105 153,102 156,97 C 158,91 150,85 150,85" fill="none" stroke="rgba(0,0,0,0.11)" strokeWidth="1.4"/>

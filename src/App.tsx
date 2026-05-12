@@ -13,7 +13,11 @@ import LearningGuide from './components/LearningGuide';
 import ScenariosPanel from './components/ScenariosPanel';
 import { drugs as allDrugs } from './data/drugs';
 import type { Scenario } from './data/scenarios';
+import { SCENARIO_QUIZZES } from './data/quiz';
+import { saveRecord, makeId, type SessionRecord } from './data/sessionHistory';
 import { getActiveCritical, type CriticalThreshold } from './data/thresholds';
+import QuizPanel, { QuizResult } from './components/QuizPanel';
+import OrganInfoPanel, { type OrganKey } from './components/OrganInfoPanel';
 import NTGraph from './components/NTGraph';
 import { calculateNTLevels } from './utils/pharmacology';
 
@@ -43,6 +47,18 @@ export default function App() {
   const [freeCritical, setFreeCritical]     = useState<'none' | 'warning' | 'dead'>('none');
   const [freeCriticalTime, setFreeCriticalTime] = useState(20);
   const [freeCriticalInfo, setFreeCriticalInfo] = useState<CriticalThreshold | null>(null);
+
+  // Quiz
+  const [quizPhase, setQuizPhase]   = useState<'none' | 'quiz' | 'result'>('none');
+  const [quizScore, setQuizScore]   = useState(0);
+
+  // Histórico da sessão
+  const sessionAttempts  = useRef<number>(0);
+  const sessionWrongDrugs = useRef<Set<string>>(new Set());
+  const sessionStartTime  = useRef<number>(Date.now());
+
+  // Anatomia interativa
+  const [activeOrgan, setActiveOrgan] = useState<OrganKey | null>(null);
   const [mobilePanel, setMobilePanel] = useState<MobilePanel>('boneco');
   const [activeDrugs, setActiveDrugs] = useState<ActiveDrug[]>([]);
   const [isLight, setIsLight]         = useState(() => localStorage.getItem('theme') === 'light');
@@ -119,6 +135,14 @@ export default function App() {
     return () => clearTimeout(t);
   }, [freeCritical, freeCriticalTime]);
 
+  // Dica progressiva atual
+  const currentHint = useMemo(() => {
+    if (scenarioPhase !== 'active' || !activeScenario) return null;
+    const active = activeScenario.hints.filter(h => timeLeft <= h.atTimeLeft);
+    if (!active.length) return null;
+    return active.reduce((best, h) => h.atTimeLeft < best.atTimeLeft ? h : best);
+  }, [timeLeft, scenarioPhase, activeScenario]);
+
   // Vitals e bodyState exibidos (usa baseline quando fase ativa + sem fármacos)
   const displayVitals = (scenarioPhase !== 'none' && activeDrugs.length === 0 && activeScenario)
     ? activeScenario.baselineVitals
@@ -130,8 +154,14 @@ export default function App() {
   if (!started) return <IntroScreen onStart={() => setStarted(true)} />;
 
   function handleAdminister(drug: Drug, dose: number) {
+    // Rastreia fármacos errados durante cenário
+    if (scenarioPhase === 'active' && activeScenario) {
+      const correctIds = new Set(activeScenario.drugs.map(d => d.drugId));
+      if (!correctIds.has(drug.id)) sessionWrongDrugs.current.add(drug.name);
+    } else {
+      setActiveScenario(null);
+    }
     setActiveDrugs(prev => [...prev, { instanceId: `${drug.id}-${++idCounter}`, drug, dose }]);
-    setActiveScenario(null);
   }
   function handleRemove(id: string) {
     setActiveDrugs(prev => prev.filter(d => d.instanceId !== id));
@@ -140,12 +170,17 @@ export default function App() {
 
   function handleSimulateScenario(scenario: Scenario) {
     scenarioStartRef.current = Date.now();
+    sessionStartTime.current = Date.now();
+    sessionAttempts.current = 1;
+    sessionWrongDrugs.current = new Set();
     setActiveDrugs([]);
     setActiveScenario(scenario);
     setScenarioPhase('active');
     setTimeLeft(60);
+    setQuizPhase('none');
     setFreeCritical('none');
     setFreeCriticalTime(20);
+    setActiveOrgan(null);
     setMode('sim');
     setMobilePanel('boneco');
   }
@@ -153,11 +188,32 @@ export default function App() {
   function handleRestartScenario() {
     if (!activeScenario) return;
     scenarioStartRef.current = Date.now();
+    sessionStartTime.current = Date.now();
+    sessionAttempts.current += 1;
+    sessionWrongDrugs.current = new Set();
     setActiveDrugs([]);
     setScenarioPhase('active');
     setTimeLeft(60);
+    setQuizPhase('none');
     setFreeCritical('none');
     setFreeCriticalTime(20);
+  }
+
+  function saveAndShowQuiz(outcome: 'solved' | 'dead', score: number | null) {
+    if (!activeScenario) return;
+    const record: SessionRecord = {
+      id: makeId(),
+      scenarioId: activeScenario.id,
+      scenarioTitle: activeScenario.title,
+      scenarioColor: activeScenario.color,
+      outcome,
+      timeUsed: Math.round((Date.now() - sessionStartTime.current) / 1000),
+      attempts: sessionAttempts.current,
+      wrongDrugs: [...sessionWrongDrugs.current],
+      quizScore: score,
+      timestamp: Date.now(),
+    };
+    saveRecord(record);
   }
 
   function handleExitScenario() {
@@ -166,9 +222,11 @@ export default function App() {
     setActiveScenario(null);
     setScenarioPhase('none');
     setTimeLeft(60);
+    setQuizPhase('none');
     setFreeCritical('none');
     setFreeCriticalTime(20);
     setFreeCriticalInfo(null);
+    setActiveOrgan(null);
     setMode('cenarios');
   }
 
@@ -220,7 +278,13 @@ export default function App() {
       </div>
 
       <div style={{ width: '100%', maxWidth: 260, flexShrink: 0 }}>
-        <Character bodyState={displayBodyState} vitals={displayVitals} isDead={isDead} />
+        <div style={{ position: 'relative', width: '100%', maxWidth: 260 }}>
+          <Character bodyState={displayBodyState} vitals={displayVitals} isDead={isDead}
+            onOrganClick={organ => setActiveOrgan(prev => prev === organ ? null : organ)} />
+          {activeOrgan && (
+            <OrganInfoPanel organ={activeOrgan} onClose={() => setActiveOrgan(null)} />
+          )}
+        </div>
       </div>
 
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5, justifyContent: 'center', maxWidth: 340, fontSize: 10 }}>
@@ -372,6 +436,12 @@ export default function App() {
             <>
               <span style={{ fontSize: 13, color: '#2ecc71', fontWeight: 700 }}>Tratamento correto!</span>
               <span style={{ fontSize: 12, color: '#8b949e' }}>Paciente estabilizado — {activeScenario.title}</span>
+              {SCENARIO_QUIZZES[activeScenario.id] && quizPhase === 'none' && (
+                <button onClick={() => { saveAndShowQuiz('solved', null); setQuizPhase('quiz'); }}
+                  style={{ marginLeft: 8, background: '#2ecc7120', border: '1px solid #2ecc7144', borderRadius: 5, padding: '3px 10px', color: '#2ecc71', fontSize: 11, fontWeight: 700, cursor: 'pointer' }}>
+                  Fazer quiz
+                </button>
+              )}
             </>
           ) : (
             <>
@@ -380,6 +450,16 @@ export default function App() {
               </span>
               <span style={{ fontSize: 13, color: '#e6edf3', fontWeight: 600 }}>{activeScenario.title}</span>
               <span style={{ fontSize: 12, color: '#8b949e' }}>— Administre o fármaco correto</span>
+              {currentHint && (
+                <span style={{
+                  fontSize: 11, color: '#f39c12',
+                  background: 'rgba(243,156,18,0.1)', border: '1px solid rgba(243,156,18,0.3)',
+                  borderRadius: 5, padding: '3px 10px', marginLeft: 4,
+                  animation: 'pulse 2s ease-in-out infinite',
+                }}>
+                  Dica: {currentHint.text}
+                </span>
+              )}
               {/* Countdown */}
               <span style={{
                 marginLeft: 8, fontFamily: 'monospace', fontWeight: 800, fontSize: 15,
@@ -494,6 +574,14 @@ export default function App() {
                   {activeScenario.drugNames.join(' + ')}
                 </strong>
               </div>
+              <div style={{ display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap', marginBottom: 12 }}>
+                {SCENARIO_QUIZZES[activeScenario.id] && quizPhase === 'none' && (
+                  <button onClick={() => { saveAndShowQuiz('dead', null); setQuizPhase('quiz'); }}
+                    style={{ background: '#f39c1220', border: '1px solid #f39c1244', borderRadius: 8, padding: '8px 20px', color: '#f39c12', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
+                    Testar meu conhecimento
+                  </button>
+                )}
+              </div>
               <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
                 <button
                   onClick={handleRestartScenario}
@@ -518,6 +606,25 @@ export default function App() {
               </div>
             </div>
           </div>
+        )}
+
+        {/* Overlays de Quiz */}
+        {quizPhase === 'quiz' && activeScenario && SCENARIO_QUIZZES[activeScenario.id] && (
+          <QuizPanel
+            questions={SCENARIO_QUIZZES[activeScenario.id]}
+            scenarioTitle={activeScenario.title}
+            scenarioColor={activeScenario.color}
+            onComplete={score => { setQuizScore(score); saveAndShowQuiz(scenarioPhase === 'dead' ? 'dead' : 'solved', score); setQuizPhase('result'); }}
+          />
+        )}
+        {quizPhase === 'result' && activeScenario && (
+          <QuizResult
+            score={quizScore}
+            total={SCENARIO_QUIZZES[activeScenario.id]?.length ?? 3}
+            scenarioColor={activeScenario.color}
+            onRetry={handleRestartScenario}
+            onBack={handleExitScenario}
+          />
         )}
 
         {/* Conteúdo da simulação */}
