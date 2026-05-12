@@ -9,7 +9,13 @@ const BASELINE_VITALS: VitalSigns = {
   temperature: 36.5,
 };
 
-export function calculateVitals(activeDrugs: ActiveDrug[]): VitalSigns {
+/** Fator de decay farmacocinético: e^(-ln2 × elapsed / t½) */
+export function decayFactor(administeredAt: number, halfLifeMinutes: number, now = Date.now()): number {
+  const elapsedMin = (now - administeredAt) / 60000;
+  return Math.exp(-Math.LN2 * elapsedMin / halfLifeMinutes);
+}
+
+export function calculateVitals(activeDrugs: ActiveDrug[], now = Date.now()): VitalSigns {
   if (activeDrugs.length === 0) return { ...BASELINE_VITALS };
 
   let hrDelta = 0;
@@ -18,8 +24,9 @@ export function calculateVitals(activeDrugs: ActiveDrug[]): VitalSigns {
   let bronchialDelta = 0;
   let sweatDelta = 0;
 
-  for (const { drug, dose } of activeDrugs) {
-    const f = dose / drug.maxDose;
+  for (const { drug, dose, administeredAt } of activeDrugs) {
+    const decay = decayFactor(administeredAt, drug.halfLifeMinutes, now);
+    const f = (dose / drug.maxDose) * decay;
     hrDelta       += drug.effects.heartRate        * f;
     sbpDelta      += drug.effects.systolicBP       * f;
     dbpDelta      += drug.effects.diastolicBP      * f;
@@ -49,7 +56,7 @@ export function calculateVitals(activeDrugs: ActiveDrug[]): VitalSigns {
   return { heartRate: hr, systolicBP: sbp, diastolicBP: dbp, respiratoryRate: rr, spO2, temperature };
 }
 
-export function calculateBodyState(activeDrugs: ActiveDrug[]): BodyVisualState {
+export function calculateBodyState(activeDrugs: ActiveDrug[], now = Date.now()): BodyVisualState {
   if (activeDrugs.length === 0) {
     return {
       heartRateMultiplier: 1, skinVasodilation: 0, pupilNormalized: 0.5,
@@ -61,8 +68,9 @@ export function calculateBodyState(activeDrugs: ActiveDrug[]): BodyVisualState {
   let hrMult = 0, skinVaso = 0, pupilDelta = 0, bronchial = 0;
   let sweat = 0, saliva = 0, lacri = 0, tremor = 0, giDelta = 0;
 
-  for (const { drug, dose } of activeDrugs) {
-    const f = dose / drug.maxDose;
+  for (const { drug, dose, administeredAt } of activeDrugs) {
+    const decay = decayFactor(administeredAt, drug.halfLifeMinutes, now);
+    const f = (dose / drug.maxDose) * decay;
     hrMult     += drug.effects.heartRate        * f;
     skinVaso   += drug.effects.skinVasodilation * f;
     pupilDelta += drug.effects.pupilDilation    * f;
@@ -133,11 +141,12 @@ const NT_MAP: Record<string, Partial<NTLevels>> = {
   cocaina:        { ne: 52, da: 46  },
 };
 
-export function calculateNTLevels(activeDrugs: ActiveDrug[]): NTLevels {
+export function calculateNTLevels(activeDrugs: ActiveDrug[], now = Date.now()): NTLevels {
   if (activeDrugs.length === 0) return { ...NT_BASELINE };
   let { ne, ach, da, epi } = NT_BASELINE;
-  for (const { drug, dose } of activeDrugs) {
-    const f = dose / drug.maxDose;
+  for (const { drug, dose, administeredAt } of activeDrugs) {
+    const decay = decayFactor(administeredAt, drug.halfLifeMinutes, now);
+    const f = (dose / drug.maxDose) * decay;
     const m = NT_MAP[drug.id];
     if (m) {
       ne  += (m.ne  ?? 0) * f;

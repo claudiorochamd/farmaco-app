@@ -16,7 +16,6 @@ export default function QuizPanel({ questions, scenarioTitle, scenarioColor, onC
 
   const q = questions[current];
   const isLast = current === questions.length - 1;
-  const score = answers.filter((a, i) => a === questions[i].correctIndex).length;
 
   function handleSelect(idx: number) {
     if (selected !== null) return;
@@ -29,7 +28,11 @@ export default function QuizPanel({ questions, scenarioTitle, scenarioColor, onC
 
   function handleNext() {
     if (isLast) {
-      onComplete(score + (selected === q.correctIndex ? 1 : 0));
+      // Calcula score completo das respostas armazenadas (já inclui a atual)
+      const finalAnswers = [...answers];
+      finalAnswers[current] = selected;
+      const finalScore = finalAnswers.filter((a, i) => a === questions[i].correctIndex).length;
+      onComplete(finalScore);
     } else {
       setCurrent(c => c + 1);
       setSelected(null);

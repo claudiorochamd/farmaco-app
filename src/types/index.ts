@@ -6,10 +6,10 @@ export type DrugClass =
   | 'variedades';
 
 export interface NTLevels {
-  ne:  number; // Noradrenalina  0–100
-  ach: number; // Acetilcolina   0–100
-  da:  number; // Dopamina       0–100
-  epi: number; // Adrenalina     0–100
+  ne:  number;
+  ach: number;
+  da:  number;
+  epi: number;
 }
 
 export interface DrugEffects {
@@ -38,12 +38,14 @@ export interface Drug {
   maxDose: number;
   unit: string;
   color: string;
+  halfLifeMinutes: number; // meia-vida em minutos
 }
 
 export interface ActiveDrug {
   instanceId: string;
   drug: Drug;
   dose: number;
+  administeredAt: number; // timestamp Date.now()
 }
 
 export interface VitalSigns {

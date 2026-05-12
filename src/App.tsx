@@ -18,9 +18,10 @@ import { saveRecord, makeId, type SessionRecord } from './data/sessionHistory';
 import { getActiveCritical, type CriticalThreshold } from './data/thresholds';
 import QuizPanel, { QuizResult } from './components/QuizPanel';
 import Tutorial from './components/Tutorial';
+import FeedbackForm from './components/FeedbackForm';
 import OrganInfoPanel, { type OrganKey } from './components/OrganInfoPanel';
 import NTGraph from './components/NTGraph';
-import { calculateNTLevels } from './utils/pharmacology';
+import { calculateNTLevels, decayFactor } from './utils/pharmacology';
 
 const NT_SIMPATICO    = [
   { key: 'ne'  as const, label: 'Noradrenalina', color: '#e67e22' },
@@ -63,8 +64,17 @@ export default function App() {
 
   // Tutorial de primeira vez
   const [showTutorial, setShowTutorial] = useState(false);
+  const [showFeedback, setShowFeedback] = useState(false);
+
+  // Tick a cada segundo para reatualizar cálculos farmacocinéticos
   const [mobilePanel, setMobilePanel] = useState<MobilePanel>('boneco');
   const [activeDrugs, setActiveDrugs] = useState<ActiveDrug[]>([]);
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    if (activeDrugs.length === 0) return;
+    const id = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(id);
+  }, [activeDrugs.length]);
   const [isLight, setIsLight]         = useState(() => localStorage.getItem('theme') === 'light');
 
   useEffect(() => {
@@ -76,11 +86,24 @@ export default function App() {
   const isMobile   = width < 700;
   const isTablet   = width >= 700 && width < 1100;
 
-  const vitals       = useMemo(() => calculateVitals(activeDrugs),                  [activeDrugs]);
-  const bodyState    = useMemo(() => calculateBodyState(activeDrugs),               [activeDrugs]);
-  const drugIds      = useMemo(() => [...new Set(activeDrugs.map(d => d.drug.id))], [activeDrugs]);
-  const interactions = useMemo(() => getActiveInteractions(drugIds),                [drugIds]);
-  const ntLevels     = useMemo(() => calculateNTLevels(activeDrugs),               [activeDrugs]);
+  const vitals       = useMemo(() => calculateVitals(activeDrugs, now),                  [activeDrugs, now]);
+  const bodyState    = useMemo(() => calculateBodyState(activeDrugs, now),               [activeDrugs, now]);
+  const drugIds      = useMemo(() => [...new Set(activeDrugs.map(d => d.drug.id))],      [activeDrugs]);
+  const interactions = useMemo(() => getActiveInteractions(drugIds),                     [drugIds]);
+  const ntLevels     = useMemo(() => calculateNTLevels(activeDrugs, now),               [activeDrugs, now]);
+
+  // Auto-remove fármacos com < 1% restante
+  useEffect(() => {
+    if (activeDrugs.length === 0) return;
+    const expired = activeDrugs.filter(
+      ad => decayFactor(ad.administeredAt, ad.drug.halfLifeMinutes, now) < 0.01
+    );
+    if (expired.length > 0) {
+      setActiveDrugs(prev => prev.filter(
+        ad => decayFactor(ad.administeredAt, ad.drug.halfLifeMinutes, Date.now()) >= 0.01
+      ));
+    }
+  }, [now]);
 
   // Timer do cenário — usa Date.now() para precisão mesmo com aba em background
   useEffect(() => {
@@ -162,7 +185,7 @@ export default function App() {
     }} />
   );
 
-  function handleAdminister(drug: Drug, dose: number) {
+  function handleAdminister(drug: Drug, dose: number, administeredAt = Date.now()) {
     // Rastreia fármacos errados durante cenário
     if (scenarioPhase === 'active' && activeScenario) {
       const correctIds = new Set(activeScenario.drugs.map(d => d.drugId));
@@ -170,7 +193,7 @@ export default function App() {
     } else {
       setActiveScenario(null);
     }
-    setActiveDrugs(prev => [...prev, { instanceId: `${drug.id}-${++idCounter}`, drug, dose }]);
+    setActiveDrugs(prev => [...prev, { instanceId: `${drug.id}-${++idCounter}`, drug, dose, administeredAt }]);
   }
   function handleRemove(id: string) {
     setActiveDrugs(prev => prev.filter(d => d.instanceId !== id));
@@ -178,8 +201,9 @@ export default function App() {
   function handleClearAll() { setActiveDrugs([]); }
 
   function handleSimulateScenario(scenario: Scenario) {
-    scenarioStartRef.current = Date.now();
-    sessionStartTime.current = Date.now();
+    const ts = Date.now();
+    scenarioStartRef.current = ts;
+    sessionStartTime.current = ts;
     sessionAttempts.current = 1;
     sessionWrongDrugs.current = new Set();
     setActiveDrugs([]);
@@ -242,7 +266,7 @@ export default function App() {
   function handleSimulateDrug(id: string) {
     const d = allDrugs.find(drug => drug.id === id);
     if (!d) return;
-    setActiveDrugs([{ instanceId: `${id}-sim`, drug: d, dose: d.maxDose * 0.6 }]);
+    setActiveDrugs([{ instanceId: `${id}-sim`, drug: d, dose: d.maxDose * 0.6, administeredAt: Date.now() }]);
     setMode('sim');
     setMobilePanel('boneco');
   }
@@ -251,9 +275,10 @@ export default function App() {
     const d1 = allDrugs.find(d => d.id === id1);
     const d2 = allDrugs.find(d => d.id === id2);
     if (!d1 || !d2) return;
+    const ts = Date.now();
     setActiveDrugs([
-      { instanceId: `${id1}-sim`, drug: d1, dose: d1.maxDose * 0.6 },
-      { instanceId: `${id2}-sim`, drug: d2, dose: d2.maxDose * 0.6 },
+      { instanceId: `${id1}-sim`, drug: d1, dose: d1.maxDose * 0.6, administeredAt: ts },
+      { instanceId: `${id2}-sim`, drug: d2, dose: d2.maxDose * 0.6, administeredAt: ts },
     ]);
     setMode('sim');
     setMobilePanel('boneco');
@@ -387,6 +412,20 @@ export default function App() {
               <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#2ecc71', boxShadow: '0 0 6px #2ecc71', display: 'inline-block' }}/>
               Simulação ativa
             </span>
+          )}
+          {!isMobile && (
+            <button
+              onClick={() => setShowFeedback(true)}
+              title="Avaliar o app"
+              style={{
+                background: 'rgba(46,204,113,0.08)', border: '1px solid #2ecc7133',
+                borderRadius: 8, padding: '5px 12px', cursor: 'pointer',
+                color: '#2ecc71', fontSize: 11, fontWeight: 600, letterSpacing: '0.02em',
+                transition: 'all 0.2s',
+              }}
+            >
+              Avaliar
+            </button>
           )}
           <button
             onClick={() => setIsLight(l => !l)}
@@ -745,6 +784,7 @@ export default function App() {
       `}</style>
 
       {showTutorial && <Tutorial onClose={() => setShowTutorial(false)} />}
+      {showFeedback && <FeedbackForm onClose={() => setShowFeedback(false)} />}
     </div>
   );
 }
