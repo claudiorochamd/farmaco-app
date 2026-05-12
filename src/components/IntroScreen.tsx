@@ -211,6 +211,10 @@ export default function IntroScreen({ onStart }: Props) {
             <p style={{ margin: '0 0 4px', fontSize: 13, color: '#8b949e' }}>
               Desenvolvido por{' '}
               <span style={{ color: '#e6edf3', fontWeight: 600 }}>Cláudio Rocha</span>
+              {' '}·{' '}
+              <a href="mailto:claudio.filho@ufpe.br" style={{ color: '#7fdbff', textDecoration: 'none', fontSize: 13 }}>
+                claudio.filho@ufpe.br
+              </a>
             </p>
             <p style={{ margin: 0, fontSize: 12, color: '#6e7681' }}>
               Estudante de Medicina &mdash; Turma 158 &mdash; Universidade Federal de Pernambuco
