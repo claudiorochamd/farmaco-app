@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(New-Item *)",
+      "PowerShell(vercel *)",
+      "Read(//mnt/c/Users/claau/**)",
+      "Bash(vercel link *)"
+    ]
+  }
+}
