@@ -381,19 +381,7 @@ function SobreSection() {
             <div style={{ background: 'white', borderRadius: 10, padding: 10, marginBottom: 12 }}>
               <QRCodeSVG value="13370451441" size={110} bgColor="#ffffff" fgColor="#0d1117" level="M"/>
             </div>
-            <div style={{ fontSize: 11, color: '#8b949e', marginBottom: 8 }}>Chave PIX</div>
-            <div style={{
-              background: '#0d1117', border: '1px solid #f39c1244',
-              borderRadius: 6, padding: '6px 12px',
-              color: '#f39c12', fontSize: 13, fontFamily: 'monospace', fontWeight: 600,
-              letterSpacing: '0.05em', cursor: 'pointer',
-            }}
-              onClick={() => navigator.clipboard?.writeText('13370451441')}
-              title="Clique para copiar"
-            >
-              13370451441
-            </div>
-            <div style={{ fontSize: 10, color: '#4d6a7a', marginTop: 6 }}>clique na chave para copiar</div>
+            <div style={{ fontSize: 11, color: '#8b949e' }}>Escaneie para contribuir via PIX</div>
           </div>
 
         </div>
