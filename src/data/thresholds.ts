@@ -50,6 +50,32 @@ export const CRITICAL_THRESHOLDS: CriticalThreshold[] = [
     cause: 'Parada cardíaca por hipotermia grave (T < 33,5°C)',
     avoidance: 'Reduza a dose dos fármacos colinérgicos que causam hipotermia por sudorese excessiva e permita a normalização da temperatura corporal.',
   },
+
+  // ─── Limiares Combinados — síndromes ───────────────────────────────────────
+  {
+    id: 'cholinergic_crisis',
+    check: v => v.heartRate < 40 && v.spO2 < 87,
+    cause: 'Síndrome colinérgica grave — colapso cardiorrespiratório combinado (FC < 40 bpm + SpO2 < 87%)',
+    avoidance: 'Administre atropina imediatamente: bloqueia receptores M2 (reverte a bradicardia) e M3 (alivia o broncoespasmo, restaurando a SpO2). É o antídoto padrão da crise colinérgica e da intoxicação por organofosforados.',
+  },
+  {
+    id: 'cardiovascular_collapse',
+    check: v => v.heartRate < 45 && v.systolicBP < 62,
+    cause: 'Colapso cardiovascular misto — bradicardia grave associada à hipotensão severa (FC < 45 bpm + PAS < 62 mmHg)',
+    avoidance: 'A associação de bradicardizantes e vasodilatadores é perigosa. Administre atropina para corrigir a FC e vasopressores (norepinefrina ou dopamina) para restaurar a PA de perfusão.',
+  },
+  {
+    id: 'adrenergic_storm',
+    check: v => v.heartRate > 160 && v.systolicBP > 180,
+    cause: 'Crise adrenérgica — estimulação simpática extrema com alto risco de infarto do miocárdio e AVC hemorrágico (FC > 160 bpm + PAS > 180 mmHg)',
+    avoidance: 'Reduza ou remova os agonistas adrenérgicos. Administre labetalol para bloquear α1 e β simultaneamente, controlando FC e PA sem causar hipotensão brusca.',
+  },
+  {
+    id: 'cocaine_overdose',
+    check: v => v.heartRate > 150 && v.systolicBP > 170 && v.temperature > 38.8,
+    cause: 'Overdose de cocaína — tríade letal: taquicardia, hipertensão e hipertermia simultâneas (FC > 150 + PAS > 170 + T > 38,8°C)',
+    avoidance: 'A cocaína inibe NET e DAT, acumulando noradrenalina e dopamina. Não existe antídoto específico. Benzodiazepínicos reduzem a agitação; labetalol controla FC e PA. Evite beta-bloqueadores isolados — podem causar vasoconstrição paradoxal por α1 desimpedido.',
+  },
 ];
 
 export function getActiveCritical(v: VitalSigns): CriticalThreshold | null {
