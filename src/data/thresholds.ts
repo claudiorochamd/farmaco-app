@@ -40,14 +40,14 @@ export const CRITICAL_THRESHOLDS: CriticalThreshold[] = [
   },
   {
     id: 'hyperthermia_fatal',
-    check: v => v.temperature > 41.5,
-    cause: 'Falência de múltiplos órgãos por hipertermia maligna (T > 41,5°C)',
+    check: v => v.temperature > 41.0,
+    cause: 'Falência de múltiplos órgãos por hipertermia maligna (T > 41,0°C)',
     avoidance: 'Interrompa os anticolinérgicos que causam anhidrose. A sudorese é o principal mecanismo de resfriamento corporal — bloqueá-la impede a termorregulação.',
   },
   {
     id: 'hypothermia_fatal',
-    check: v => v.temperature < 33.5,
-    cause: 'Parada cardíaca por hipotermia grave (T < 33,5°C)',
+    check: v => v.temperature < 34.8,
+    cause: 'Parada cardíaca por hipotermia grave (T < 34,8°C)',
     avoidance: 'Reduza a dose dos fármacos colinérgicos que causam hipotermia por sudorese excessiva e permita a normalização da temperatura corporal.',
   },
 
@@ -74,7 +74,7 @@ export const CRITICAL_THRESHOLDS: CriticalThreshold[] = [
     id: 'cocaine_overdose',
     check: v => v.heartRate > 150 && v.systolicBP > 170 && v.temperature > 38.8,
     cause: 'Overdose de cocaína — tríade letal: taquicardia, hipertensão e hipertermia simultâneas (FC > 150 + PAS > 170 + T > 38,8°C)',
-    avoidance: 'A cocaína inibe NET e DAT, acumulando noradrenalina e dopamina. Não existe antídoto específico. Benzodiazepínicos reduzem a agitação; labetalol controla FC e PA. Evite beta-bloqueadores isolados — podem causar vasoconstrição paradoxal por α1 desimpedido.',
+    avoidance: 'A cocaína inibe NET e DAT, acumulando noradrenalina e dopamina na fenda sináptica. Remova a cocaína administrada. Administre labetalol para controlar FC e PA simultaneamente. Evite beta-bloqueadores isolados — sem o bloqueio α1, a vasoconstrição periférica piora.',
   },
 ];
 

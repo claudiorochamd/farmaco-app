@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
 import type { ActiveDrug, Drug } from './types';
 import { calculateVitals, calculateBodyState } from './utils/pharmacology';
@@ -37,6 +37,7 @@ export default function App() {
   const [activeScenario, setActiveScenario] = useState<Scenario | null>(null);
   const [scenarioPhase, setScenarioPhase]   = useState<'none' | 'active' | 'solved' | 'dead'>('none');
   const [timeLeft, setTimeLeft]             = useState(60);
+  const scenarioStartRef                    = useRef<number | null>(null);
 
   // Estado crítico na simulação livre
   const [freeCritical, setFreeCritical]     = useState<'none' | 'warning' | 'dead'>('none');
@@ -61,13 +62,18 @@ export default function App() {
   const interactions = useMemo(() => getActiveInteractions(drugIds),                [drugIds]);
   const ntLevels     = useMemo(() => calculateNTLevels(activeDrugs),               [activeDrugs]);
 
-  // Timer do cenário
+  // Timer do cenário — usa Date.now() para precisão mesmo com aba em background
   useEffect(() => {
     if (scenarioPhase !== 'active') return;
-    if (timeLeft <= 0) { setScenarioPhase('dead'); return; }
-    const t = setTimeout(() => setTimeLeft(p => p - 1), 1000);
-    return () => clearTimeout(t);
-  }, [scenarioPhase, timeLeft]);
+    const id = setInterval(() => {
+      const start = scenarioStartRef.current;
+      if (!start) return;
+      const remaining = Math.max(0, 60 - Math.floor((Date.now() - start) / 1000));
+      setTimeLeft(remaining);
+      if (remaining <= 0) setScenarioPhase('dead');
+    }, 250);
+    return () => clearInterval(id);
+  }, [scenarioPhase]);
 
   // Detecta fármaco correto
   useEffect(() => {
@@ -133,26 +139,36 @@ export default function App() {
   function handleClearAll() { setActiveDrugs([]); }
 
   function handleSimulateScenario(scenario: Scenario) {
-    setActiveDrugs([]);            // começa sem fármaco — sintomas são do baseline
+    scenarioStartRef.current = Date.now();
+    setActiveDrugs([]);
     setActiveScenario(scenario);
     setScenarioPhase('active');
     setTimeLeft(60);
+    setFreeCritical('none');
+    setFreeCriticalTime(20);
     setMode('sim');
     setMobilePanel('boneco');
   }
 
   function handleRestartScenario() {
     if (!activeScenario) return;
+    scenarioStartRef.current = Date.now();
     setActiveDrugs([]);
     setScenarioPhase('active');
     setTimeLeft(60);
+    setFreeCritical('none');
+    setFreeCriticalTime(20);
   }
 
   function handleExitScenario() {
+    scenarioStartRef.current = null;
     setActiveDrugs([]);
     setActiveScenario(null);
     setScenarioPhase('none');
     setTimeLeft(60);
+    setFreeCritical('none');
+    setFreeCriticalTime(20);
+    setFreeCriticalInfo(null);
     setMode('cenarios');
   }
 
@@ -412,7 +428,7 @@ export default function App() {
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', minHeight: 0, position: 'relative' }}>
 
         {/* ── Tela de óbito — simulação livre ── */}
-        {freeCritical === 'dead' && freeCriticalInfo && (
+        {freeCritical === 'dead' && freeCriticalInfo && scenarioPhase !== 'dead' && (
           <div style={{
             position: 'absolute', inset: 0, zIndex: 50,
             background: 'rgba(0,0,0,0.90)', backdropFilter: 'blur(6px)',

@@ -44,7 +44,7 @@ export function calculateVitals(activeDrugs: ActiveDrug[]): VitalSigns {
   let tempDelta = 0;
   if (sweatDelta < -0.3) tempDelta = (-sweatDelta - 0.3) * 2.5; // anhidrose → aquecimento
   if (sweatDelta >  0.3) tempDelta = -(sweatDelta - 0.3) * 1.2; // sudorese → resfriamento
-  const temperature = clamp(36.5 + tempDelta, 34.5, 41.5);
+  const temperature = clamp(36.5 + tempDelta, 34.0, 42.0);
 
   return { heartRate: hr, systolicBP: sbp, diastolicBP: dbp, respiratoryRate: rr, spO2, temperature };
 }
