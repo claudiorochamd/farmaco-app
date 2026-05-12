@@ -1,36 +1,33 @@
 import { useState } from 'react';
 import { useWindowWidth } from '../hooks/useWindowWidth';
-import { drugs } from '../data/drugs';
-import { interactions } from '../data/interactions';
 
 const TOPICS = [
-  { id: 'sna',       label: 'Visão Geral do SNA',         color: '#7fdbff' },
-  { id: 'rec_a',     label: 'Receptores Adrenérgicos',     color: '#e67e22' },
-  { id: 'rec_c',     label: 'Receptores Colinérgicos',     color: '#27ae60' },
-  { id: 'agon_a',    label: 'Agonistas Adrenérgicos',      color: '#e67e22' },
-  { id: 'bloq_a',    label: 'Bloqueadores Adrenérgicos',   color: '#95a5a6' },
-  { id: 'agon_c',    label: 'Agonistas Colinérgicos',      color: '#27ae60' },
-  { id: 'bloq_c',    label: 'Bloqueadores Colinérgicos',   color: '#8e44ad' },
-  { id: 'inter',     label: 'Interações Medicamentosas',   color: '#f39c12' },
-  { id: 'tabela',    label: 'Tabela Resumo',                color: '#c9d1d9' },
+  { id: 'sna',     label: 'Visão Geral do SNA',             color: '#7fdbff' },
+  { id: 'trans',   label: 'Neurotransmissão',                color: '#7fdbff' },
+  { id: 'rec_a',   label: 'Receptores Adrenérgicos',         color: '#e67e22' },
+  { id: 'rec_c',   label: 'Receptores Colinérgicos',         color: '#27ae60' },
+  { id: 'agon_a',  label: 'Agonistas Adrenérgicos',          color: '#e67e22' },
+  { id: 'bloq_a',  label: 'Bloqueadores Adrenérgicos',       color: '#95a5a6' },
+  { id: 'agon_c',  label: 'Agonistas Colinérgicos',          color: '#27ae60' },
+  { id: 'bloq_c',  label: 'Bloqueadores Colinérgicos',       color: '#8e44ad' },
+  { id: 'inter',   label: 'Interações Medicamentosas',       color: '#f39c12' },
+  { id: 'tabela',  label: 'Tabela Resumo',                   color: '#c9d1d9' },
 ];
+
+import { drugs } from '../data/drugs';
+import { interactions } from '../data/interactions';
 
 export default function LearningGuide() {
   const [active, setActive] = useState('sna');
   const width    = useWindowWidth();
   const isMobile = width < 700;
-  const topic = TOPICS.find(t => t.id === active)!;
+  const topic    = TOPICS.find(t => t.id === active)!;
 
   return (
     <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', flex: 1, minHeight: 0, overflow: 'hidden' }}>
 
-      {/* ── SIDEBAR (desktop) / SCROLL HORIZONTAL (mobile) ─── */}
       {isMobile ? (
-        <div style={{
-          display: 'flex', overflowX: 'auto', gap: 6,
-          padding: '10px 12px', background: '#0d1117',
-          borderBottom: '1px solid #21262d', flexShrink: 0,
-        }}>
+        <div style={{ display: 'flex', overflowX: 'auto', gap: 6, padding: '10px 12px', background: '#0d1117', borderBottom: '1px solid #21262d', flexShrink: 0 }}>
           {TOPICS.map(t => (
             <button key={t.id} onClick={() => setActive(t.id)} style={{
               whiteSpace: 'nowrap', flexShrink: 0,
@@ -38,23 +35,15 @@ export default function LearningGuide() {
               border: `1px solid ${active === t.id ? t.color : '#21262d'}`,
               borderRadius: 20, padding: '6px 12px',
               color: active === t.id ? t.color : '#6b7280',
-              fontSize: 12, fontWeight: active === t.id ? 600 : 400,
-              cursor: 'pointer',
+              fontSize: 12, fontWeight: active === t.id ? 600 : 400, cursor: 'pointer',
             }}>
               {t.label}
             </button>
           ))}
         </div>
       ) : (
-        <nav style={{
-          width: 220, flexShrink: 0, background: '#0d1117',
-          borderRight: '1px solid #21262d',
-          display: 'flex', flexDirection: 'column',
-          overflowY: 'auto', padding: '12px 10px', gap: 4,
-        }}>
-          <p style={{ margin: '0 0 8px 6px', fontSize: 10, color: '#4d6a7a', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 600 }}>
-            Tópicos
-          </p>
+        <nav style={{ width: 220, flexShrink: 0, background: '#0d1117', borderRight: '1px solid #21262d', display: 'flex', flexDirection: 'column', overflowY: 'auto', padding: '12px 10px', gap: 4 }}>
+          <p style={{ margin: '0 0 8px 6px', fontSize: 10, color: '#4d6a7a', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 600 }}>Tópicos</p>
           {TOPICS.map(t => (
             <button key={t.id} onClick={() => setActive(t.id)} style={{
               background: active === t.id ? `${t.color}18` : 'transparent',
@@ -71,29 +60,20 @@ export default function LearningGuide() {
         </nav>
       )}
 
-      {/* ── CONTENT ─────────────────────────────────────────── */}
-      <div style={{
-        flex: 1, overflowY: 'auto',
-        background: 'linear-gradient(180deg,#0d1117,#0a1018)',
-        padding: isMobile ? '20px 16px' : '28px 36px',
-      }}>
+      <div style={{ flex: 1, overflowY: 'auto', background: 'linear-gradient(180deg,#0d1117,#0a1018)', padding: isMobile ? '20px 16px' : '28px 36px' }}>
         <div style={{ maxWidth: 860 }}>
           <div style={{ marginBottom: 24 }}>
-            <span style={{ fontSize: 10, color: topic.color, textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 600 }}>
-              Guia de Aprendizado
-            </span>
-            <h2 style={{ margin: '4px 0 0', fontSize: 22, color: '#e6edf3', fontWeight: 700 }}>
-              {topic.label}
-            </h2>
+            <span style={{ fontSize: 10, color: topic.color, textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 600 }}>Guia de Aprendizado</span>
+            <h2 style={{ margin: '4px 0 0', fontSize: 22, color: '#e6edf3', fontWeight: 700 }}>{topic.label}</h2>
           </div>
-
           {active === 'sna'    && <SnaSection />}
+          {active === 'trans'  && <TransSection />}
           {active === 'rec_a'  && <RecAdren />}
           {active === 'rec_c'  && <RecColin />}
-          {active === 'agon_a' && <DrugSection cls="agonista_adrenergico" color="#e67e22" />}
-          {active === 'bloq_a' && <DrugSection cls="bloqueador_adrenergico" color="#95a5a6" />}
-          {active === 'agon_c' && <DrugSection cls="agonista_colinergico" color="#27ae60" />}
-          {active === 'bloq_c' && <DrugSection cls="bloqueador_colinergico" color="#8e44ad" />}
+          {active === 'agon_a' && <AgonAdren />}
+          {active === 'bloq_a' && <BloqAdren />}
+          {active === 'agon_c' && <AgonColin />}
+          {active === 'bloq_c' && <BloqColin />}
           {active === 'inter'  && <InterSection />}
           {active === 'tabela' && <SummaryTable />}
         </div>
@@ -102,82 +82,133 @@ export default function LearningGuide() {
   );
 }
 
-// ─── VISÃO GERAL ──────────────────────────────────────────────────────────────
+// ─── VISÃO GERAL DO SNA ──────────────────────────────────────────────────────
 function SnaSection() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
       <InfoBox color="#7fdbff">
-        O Sistema Nervoso Autônomo (SNA) regula funções viscerais involuntárias. Divide-se em
-        divisão <strong>simpática</strong> (luta ou fuga) e <strong>parassimpática</strong> (repouso e digestão).
-        Ambas usam dois neurônios em série: pré-ganglionar e pós-ganglionar.
+        O SNA regula funções viscerais involuntárias. É organizado em 2 neurônios em série:
+        neurônio <strong>pré-ganglionar</strong> (dentro do SNC) e neurônio <strong>pós-ganglionar</strong> (fora do SNC, no gânglio autonômico),
+        sob controle do hipotálamo e sistema límbico.
       </InfoBox>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
-        <DivCard
-          title="Divisão Simpática"
-          color="#e67e22"
-          items={[
-            'Neurônios pré-ganglionares curtos',
-            'Neurônios pós-ganglionares longos',
-            'Neurotransmissor pós: Noradrenalina (NA)',
-            'Receptores efetores: α e β adrenérgicos',
-            'Resposta: "fight or flight"',
-            'Gânglios paravertebrais e pré-vertebrais',
-          ]}
-        />
-        <DivCard
-          title="Divisão Parassimpática"
-          color="#27ae60"
-          items={[
-            'Neurônios pré-ganglionares longos',
-            'Neurônios pós-ganglionares curtos',
-            'Neurotransmissor pós: Acetilcolina (ACh)',
-            'Receptores efetores: muscarínicos (M)',
-            'Resposta: "rest and digest"',
-            'Nervos cranianos III, VII, IX, X e S2-S4',
-          ]}
-        />
+        <DivCard title="Divisão Simpática" color="#e67e22" items={[
+          'Fibras pré-ganglionares: origem toracolombares (T1–T12, L1–L3) — CURTAS',
+          'Fibras pós-ganglionares: gânglios para-/pré-vertebrais — LONGAS',
+          'Neurotransmissor pré: Acetilcolina (receptores Nn)',
+          'Neurotransmissor pós: Noradrenalina (receptores α e β)',
+          'Exceção: glândulas salivares, sudoríparas, lacrimais e medula suprarrenal — o pós-ganglionar libera ACh',
+          'Resposta: "fight or flight" — luta ou fuga',
+        ]}/>
+        <DivCard title="Divisão Parassimpática" color="#27ae60" items={[
+          'Fibras pré-ganglionares: origem craniossacral (nervos III, VII, IX, X e S2–S4) — LONGAS',
+          'Fibras pós-ganglionares: gânglios próximos ao órgão efetor — CURTAS',
+          'Neurotransmissor pré e pós: Acetilcolina',
+          'Receptores efetores: muscarínicos (M1–M5)',
+          'Resposta: "rest and digest" — repouso e digestão',
+        ]}/>
       </div>
 
-      <SectionTitle>Efeitos Comparativos</SectionTitle>
-      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
-        <thead>
-          <tr style={{ background: '#111c2b' }}>
-            <Th>Órgão / Sistema</Th>
-            <Th color="#e67e22">Simpático (receptor)</Th>
-            <Th color="#27ae60">Parassimpático (receptor)</Th>
-          </tr>
-        </thead>
-        <tbody>
-          {[
-            ['Coração — FC',       '↑ FC, ↑ Contratilidade (β1)',     '↓ FC, ↓ Condução AV (M2)'],
-            ['Vasos sanguíneos',   'Vasoconstrição (α1)',               'Vasodilatação (M3)'],
-            ['Brônquios',          'Broncodilatação (β2)',               'Broncoconstrição, ↑ secreção (M3)'],
-            ['Pupilas',            'Midríase — dilatação (α1)',         'Miose — constrição (M3)'],
-            ['Trato GI',           '↓ Motilidade, contração esfíncter (α1, β2)', '↑ Motilidade, relaxamento esfíncter (M3)'],
-            ['Bexiga',             'Relaxamento detrusor (β2)',         'Contração detrusor, micção (M3)'],
-            ['Glândulas sudoríparas', 'Sudorese (M — inervação colinérgica simpática)', '—'],
-            ['Glândulas salivares', '↓ Secreção espessa',              '↑ Secreção aquosa (M3)'],
-            ['Fígado',             'Glicogenólise, gliconeogênese (β2)', '—'],
-            ['Medula adrenal',     'Liberação de Adrenalina / NA (N)', '—'],
-          ].map(([organ, symp, para], i) => (
-            <tr key={i} style={{ background: i % 2 === 0 ? '#0d1117' : '#111820' }}>
-              <Td bold>{organ}</Td>
-              <Td color="#e67e22">{symp}</Td>
-              <Td color="#27ae60">{para}</Td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <Note>Simpático e parassimpático normalmente se opõem, mas há casos em que se somam: ejaculação (simpático) + ereção (parassimpático). A secreção salivar fica mais densa no simpático e mais líquida no parassimpático.</Note>
 
-      <Mnemonic color="#7fdbff" title="Regra geral">
-        <p style={{ margin: '0 0 6px', fontSize: 12, color: '#c9d1d9', lineHeight: 1.7 }}>
-          <strong>Simpático</strong> = luta, fuga, susto → coração acelerado, pupilas abertas, brônquios dilatados, GI inibido.
-        </p>
-        <p style={{ margin: 0, fontSize: 12, color: '#c9d1d9', lineHeight: 1.7 }}>
-          <strong>Parassimpático</strong> = repouso, digestão → coração lento, pupilas fechadas, GI ativo, secreções aumentadas.
-        </p>
-      </Mnemonic>
+      <SectionTitle>Sistema Entérico</SectionTitle>
+      <InfoBox color="#7fdbff">
+        Organizado pelos plexos <strong>mioentérico</strong> (de Auerbach) e <strong>submucoso</strong> (de Meissner). Possui vários neurotransmissores e pode funcionar de forma autônoma, regulando a motilidade e secreção do TGI.
+      </InfoBox>
+
+      <SectionTitle>Efeitos Comparativos</SectionTitle>
+      <div style={{ overflowX: 'auto' }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
+          <thead>
+            <tr style={{ background: '#111c2b' }}>
+              <Th>Órgão / Sistema</Th>
+              <Th color="#e67e22">Simpático (receptor)</Th>
+              <Th color="#27ae60">Parassimpático (receptor)</Th>
+            </tr>
+          </thead>
+          <tbody>
+            {[
+              ['Coração — FC',          '↑ FC, ↑ contratilidade, ↑ condução (β1)',       '↓ FC, ↓ condução AV (M2)'],
+              ['Vasos sanguíneos',       'Vasoconstrição (α1) / Vasodilatação músculo (β2)', 'Vasodilatação via NO (M3)'],
+              ['Brônquios',             'Broncodilatação (β2)',                             'Broncoconstrição, ↑ secreção (M3)'],
+              ['Pupilas',               'Midríase — M. radial (α1)',                       'Miose — M. constritor (M3)'],
+              ['Trato GI — motilidade', '↓ peristaltismo, contração esfíncteres (α1, β2)', '↑ peristaltismo, relaxamento esfíncteres (M3)'],
+              ['Bexiga urinária',       'Relaxamento detrusor (β2), contração esfíncter (α1)', 'Contração detrusor (M3), relaxamento esfíncter (M2)'],
+              ['Glândulas exócrinas',  '↓ secreção (α1)',                                  '↑ secreção salivar, lacrimal, suor, brônquica (M3)'],
+              ['Fígado',               'Glicogenólise + gliconeogênese (β2)',              '—'],
+              ['Pâncreas',             'Inibe insulina (α2), estimula glucagon (β2)',      '—'],
+              ['Rins',                 'Libera renina (β1)',                               '—'],
+              ['Medula suprarrenal',   'Libera Adrenalina / Noradrenalina (Nn)',           '—'],
+            ].map(([organ, symp, para], i) => (
+              <tr key={i} style={{ background: i % 2 === 0 ? '#0d1117' : '#111820' }}>
+                <Td bold>{organ}</Td>
+                <Td color="#e67e22">{symp}</Td>
+                <Td color="#27ae60">{para}</Td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+// ─── NEUROTRANSMISSÃO ────────────────────────────────────────────────────────
+function TransSection() {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+      <SectionTitle>Neurotransmissão Adrenérgica</SectionTitle>
+      <InfoBox color="#e67e22">
+        <strong>Síntese das catecolaminas:</strong><br/>
+        Tirosina → <em>(Tirosina hidroxilase — etapa limitante)</em> → L-DOPA → <em>(DOPA descarboxilase)</em> → Dopamina → <em>(VMAT, para vesícula)</em><br/>
+        Dopamina → <em>(Dopamina β-hidroxilase)</em> → Norepinefrina → liberada por exocitose (Ca²⁺)<br/>
+        Norepinefrina → <em>(PNMT, na medula suprarrenal)</em> → Epinefrina<br/><br/>
+        <strong>Recaptação:</strong> NET (transportador de norepinefrina) recapta NE da fenda para o terminal axonal.<br/>
+        <strong>Metabolismo:</strong> NE e Epi → COMT + MAO-A · Dopamina → COMT + MAO-B
+      </InfoBox>
+
+      <SectionTitle>Fármacos que interferem na transmissão adrenérgica</SectionTitle>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+        {[
+          { drug: 'Reserpina',        action: 'Inibe VMAT → esgota pool de reserva de NE. Causa depressão central (afeta todas as monoaminas, incluindo serotonina).' },
+          { drug: 'Cocaína / Anfetamina', action: 'Inibem NET → mais NE na fenda sináptica. Anfetaminas também estimulam liberação de catecolaminas e inibem MAO.' },
+          { drug: 'α-metiltirosina',  action: 'Inibe Tirosina hidroxilase → bloqueia síntese de NE.' },
+          { drug: 'Inibidores da MAO',action: 'Maior disponibilidade de NE, dopamina e serotonina.' },
+        ].map(({ drug, action }) => (
+          <div key={drug} style={{ background: '#111c2b', border: '1px solid #e67e2233', borderRadius: 8, padding: '10px 14px' }}>
+            <div style={{ color: '#e67e22', fontWeight: 700, fontSize: 13, marginBottom: 4 }}>{drug}</div>
+            <p style={{ margin: 0, fontSize: 12, color: '#8b949e', lineHeight: 1.6 }}>{action}</p>
+          </div>
+        ))}
+      </div>
+
+      <SectionTitle>Neurotransmissão Colinérgica</SectionTitle>
+      <InfoBox color="#27ae60">
+        <strong>Síntese:</strong> AcCoA + Colina → <em>(Colina acetiltransferase)</em> → ACh → <em>(VAchT)</em> → vesícula → exocitose (Ca²⁺)<br/><br/>
+        <strong>Degradação:</strong><br/>
+        • <em>Acetilcolinesterase (AChE)</em> — na fenda sináptica, ataca o grupamento éster<br/>
+        • <em>Butirilcolinesterase (BuChE)</em> — fora da fenda, degrada qualquer éster<br/>
+        → Colina + Acetato. A colina é recaptada e sofre "síntese de novo".
+      </InfoBox>
+
+      <SectionTitle>Fármacos que interferem na transmissão colinérgica</SectionTitle>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+        {[
+          { drug: 'Hemicolínio',         action: 'Inibe captação neuronal de colina → bloqueia síntese de ACh.' },
+          { drug: 'Vesamicol',           action: 'Inibe VAchT → impede armazenamento de ACh nas vesículas.' },
+          { drug: 'Toxina Botulínica',   action: 'Inibe o complexo de proteínas que promove a exocitose das vesículas de ACh.' },
+          { drug: 'Anticolinesterásicos',action: 'Inibem a AChE → aumentam a quantidade de ACh disponível na fenda sináptica.' },
+        ].map(({ drug, action }) => (
+          <div key={drug} style={{ background: '#111c2b', border: '1px solid #27ae6033', borderRadius: 8, padding: '10px 14px' }}>
+            <div style={{ color: '#27ae60', fontWeight: 700, fontSize: 13, marginBottom: 4 }}>{drug}</div>
+            <p style={{ margin: 0, fontSize: 12, color: '#8b949e', lineHeight: 1.6 }}>{action}</p>
+          </div>
+        ))}
+      </div>
+
+      <Note>Síndrome de Eaton Lambert: doença autoimune que destrói o complexo de proteínas que libera ACh (análoga à toxina botulínica). Síndrome de Sjögren: secura ocular e na boca por processo autoimune de destruição glandular.</Note>
+      <Note>Miastenia gravis: destruição progressiva dos receptores nicotínicos Nm (autoimune), gerando fraqueza muscular, paralisia diafragmática e morte.</Note>
     </div>
   );
 }
@@ -188,54 +219,69 @@ function RecAdren() {
     {
       name: 'α1', color: '#e67e22',
       coupling: 'Gq → ↑ IP₃/DAG → ↑ Ca²⁺',
-      location: 'Músculo liso vascular, íris (radial), bexiga (esfíncter), pele',
-      effects: ['Vasoconstrição', 'Midríase', 'Contração esfíncter urinário', 'Contração músculo liso GI (esfíncter)'],
-      agonists: ['Fenilefrina', 'Epinefrina', 'Norepinefrina'],
-      antagonists: ['Prazosina', 'Fentolamina', 'Labetalol'],
+      potencia: 'NE > Epi >> ISO',
+      location: 'Músculo liso vascular (α1B), próstata (α1A), aorta/coronárias (α1D), íris (M. radial), esfíncter bexiga',
+      effects: ['Vasoconstrição', 'Broncoconstrição', 'Midríase (contração M. radial)', 'Contração esfíncteres TGI e bexiga', 'Contração musculatura uterina', 'Ejaculação (vias seminais e próstata)', 'Glicogenólise hepática'],
+      agonists: ['Fenilefrina', 'Epinefrina', 'Norepinefrina', 'Midodrina'],
+      antagonists: ['Prazosina', 'Fentolamina', 'Fenoxibenzamina', 'Labetalol'],
     },
     {
       name: 'α2', color: '#d35400',
       coupling: 'Gi → ↓ AMPc',
-      location: 'Pré-sináptico (autorreceptor), SNC, plaquetas, vasos',
-      effects: ['Inibe liberação de NA (pré-sináptico)', 'Vasoconstrição (vascular)', 'Reduz tônus simpático central', 'Inibe agregação plaquetária'],
-      agonists: ['Clonidina (central)', 'Metildopa'],
+      potencia: 'Epi ≥ NE >> ISO',
+      location: 'Pré-sináptico (autorreceptor) — terminal adrenérgico; também pós-sináptico em vasos e pâncreas',
+      effects: ['↓ liberação de NE (pré-sináptico — "freio" simpático)', 'Vasoconstrição (quando pós-sináptico)', 'Inibição liberação de insulina (pós-sináptico)', 'Estimula agregação plaquetária'],
+      agonists: ['Clonidina (central)', 'Brimonidina', 'Apraclonidina', 'MetilDOPA'],
       antagonists: ['Ioimbina', 'Fentolamina'],
     },
     {
       name: 'β1', color: '#f39c12',
       coupling: 'Gs → ↑ AMPc → ↑ PKA',
-      location: 'Coração, rins (aparelho justaglomerular)',
-      effects: ['↑ Frequência cardíaca (cronotropia +)', '↑ Contratilidade (inotropia +)', '↑ Velocidade condução (dromocropia +)', '↑ Liberação de renina (rins)'],
-      agonists: ['Dobutamina', 'Dopamina (dose média)', 'Epinefrina', 'Norepinefrina'],
-      antagonists: ['Metoprolol', 'Atenolol', 'Propranolol'],
+      potencia: 'ISO > Epi = NE',
+      location: 'Coração (nó SA, nó AV, miocárdio) + rins (aparelho justaglomerular)',
+      effects: ['↑ Frequência cardíaca (cronotropismo +)', '↑ Força de contração (inotropismo +)', '↑ Velocidade de condução (dromotropismo +)', '↑ Liberação de renina → ↑ angiotensina II → ↑ aldosterona'],
+      agonists: ['Dobutamina (seletivo)', 'Isoproterenol', 'Epinefrina', 'Norepinefrina'],
+      antagonists: ['Metoprolol (seletivo)', 'Atenolol (seletivo)', 'Bisoprolol (seletivo)', 'Propranolol (não seletivo)'],
     },
     {
       name: 'β2', color: '#e67e22',
       coupling: 'Gs → ↑ AMPc',
-      location: 'Músculo liso brônquico, vascular, uterino; músculo esquelético',
-      effects: ['Broncodilatação', 'Vasodilatação (músculo esquelético, vasos)', 'Relaxamento uterino (tocolítico)', 'Tremor de extremidades', 'Hipocalemia (↑ captação K⁺)'],
-      agonists: ['Salbutamol', 'Isoproterenol', 'Epinefrina'],
-      antagonists: ['Propranolol (não-seletivo)', 'Butoxamina'],
+      potencia: 'ISO > Epi > NE  (Epi: vasodilatação em doses baixas; α1 em doses altas)',
+      location: 'Músculo liso brônquico, vascular, uterino, TGI, bexiga; músculo esquelético; mastócitos',
+      effects: ['Broncodilatação', 'Vasodilatação (músculo esquelético e coronárias)', 'Relaxamento uterino (tocolítico)', 'Relaxamento esfíncteres TGI e bexiga', 'Gliconeogênese hepática', 'Inibe liberação de histamina dos mastócitos', '↑ Liberação de insulina', 'Tremor de extremidades (músculo esquelético)'],
+      agonists: ['Salbutamol (seletivo)', 'Salmeterol (longa ação)', 'Terbutalina', 'Isoproterenol', 'Efedrina'],
+      antagonists: ['Propranolol (não seletivo)', 'Butoxamina (seletivo)'],
+    },
+    {
+      name: 'β3', color: '#e67e22',
+      coupling: 'Gs → ↑ AMPc',
+      potencia: 'ISO > NE > Epi',
+      location: 'Tecido adiposo, bexiga urinária (M. detrusor), tecido cardíaco',
+      effects: ['Lipólise e termogênese (tecido adiposo)', 'Relaxamento M. detrusor da bexiga (↓ incontinência urinária)', 'Inotropismo negativo cardíaco'],
+      agonists: ['Mirabegron (seletivo β3, incontinência urinária)'],
+      antagonists: ['—'],
     },
   ];
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       <InfoBox color="#e67e22">
-        Os receptores adrenérgicos são ativados pelas catecolaminas endógenas (adrenalina e noradrenalina).
-        São divididos em α e β, cada um com subtipos que possuem distribuição e funções distintas.
+        Receptores adrenérgicos são ativados pelas catecolaminas endógenas (adrenalina e noradrenalina).
+        Dividem-se em α (α1 e α2) e β (β1, β2 e β3). Cada subtipo possui distribuição tecidual,
+        acoplamento a proteína G e perfil farmacológico distintos.
       </InfoBox>
       {recs.map(r => (
         <div key={r.name} style={{ background: '#111c2b', border: `1px solid ${r.color}44`, borderRadius: 10, padding: 18 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 10, flexWrap: 'wrap' }}>
             <span style={{ fontSize: 20, fontWeight: 800, color: r.color, fontFamily: 'monospace' }}>Receptor {r.name}</span>
             <span style={{ fontSize: 11, color: '#6b7280', background: '#0d1117', borderRadius: 4, padding: '3px 8px' }}>{r.coupling}</span>
+            <span style={{ fontSize: 11, color: r.color, background: `${r.color}15`, borderRadius: 4, padding: '3px 8px' }}>Potência: {r.potencia}</span>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
             <div>
               <Label>Localização</Label>
-              <p style={{ margin: 0, fontSize: 12, color: '#8b949e', lineHeight: 1.6 }}>{r.location}</p>
-              <Label style={{ marginTop: 10 }}>Efeitos</Label>
+              <p style={{ margin: '0 0 10px', fontSize: 12, color: '#8b949e', lineHeight: 1.6 }}>{r.location}</p>
+              <Label>Efeitos principais</Label>
               <ul style={{ margin: 0, paddingLeft: 16 }}>
                 {r.effects.map((e, i) => <li key={i} style={{ fontSize: 12, color: '#c9d1d9', lineHeight: 1.8 }}>{e}</li>)}
               </ul>
@@ -262,142 +308,399 @@ function RecColin() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       <InfoBox color="#27ae60">
-        Os receptores colinérgicos são ativados pela acetilcolina (ACh). Dividem-se em
-        <strong> muscarínicos</strong> (M1–M5, acoplados à proteína G) e <strong>nicotínicos</strong> (Nm e Nn, canais iônicos).
+        Receptores colinérgicos são ativados pela acetilcolina. Dividem-se em <strong>muscarínicos</strong> (M1–M5, metabotrópicos, acoplados à proteína G)
+        e <strong>nicotínicos</strong> (Nm e Nn, ionotrópicos — canais de Na⁺/K⁺).
       </InfoBox>
 
-      <SectionTitle>Muscarínicos</SectionTitle>
+      <SectionTitle>Receptores Muscarínicos</SectionTitle>
       {[
         {
-          name: 'M1', color: '#27ae60',
-          coupling: 'Gq → ↑ IP₃/DAG',
-          location: 'SNC (hipocampo, córtex), gânglios, glândulas gástricas',
-          effects: ['Funções cognitivas e de memória', 'Estimulação ganglionar', '↑ Secreção ácida gástrica'],
-          drugs: ['Agonistas: Pilocarpina, Carbacol', 'Antagonistas: Atropina, Pirenzepina'],
+          name: 'M1', coupling: 'Gq → ↑ IP₃/DAG → ↑ Ca²⁺',
+          location: 'SNC (córtex cerebral, hipocampo, núcleo estriado), gânglios autonômicos, glândulas salivares e gástricas',
+          effects: ['Estimulação do SNC', 'Secreção salivar e gástrica (↑ HCl)', 'Despolarização ganglionar'],
+          drugs: ['Agonistas: Pilocarpina, Carbacol, ACh', 'Antagonistas: Atropina, Pirenzepina (seletivo M1 → ↓ HCl)'],
         },
         {
-          name: 'M2', color: '#1e8449',
-          coupling: 'Gi → ↓ AMPc; abertura canais K⁺',
-          location: 'Coração (nó SA, nó AV, átrios), musculatura lisa',
-          effects: ['↓ Frequência cardíaca', '↓ Condução AV (bloqueio AV em excesso)', '↓ Contratilidade atrial'],
-          drugs: ['Agonistas: ACh, Carbacol', 'Antagonistas: Atropina, Glicopirrolato'],
+          name: 'M2', coupling: 'Gi → ↓ AMPc + abertura de canais K⁺',
+          location: 'Coração (nó SA, nó AV, átrios), esfíncter bexiga urinária; também pré-sináptico',
+          effects: ['↓ Frequência cardíaca (cronotropismo negativo)', '↓ Velocidade de condução AV (dromotropismo negativo)', '↓ Força contráctil atrial (inotropismo negativo atrial)', 'Relaxamento esfíncter da bexiga urinária'],
+          drugs: ['Agonistas: ACh, Carbacol', 'Antagonistas: Atropina, Glicopirrolato, Solifenacina, Tolterodina'],
         },
         {
-          name: 'M3', color: '#27ae60',
-          coupling: 'Gq → ↑ IP₃/DAG → ↑ Ca²⁺',
-          location: 'Músculo liso (brônquios, GI, bexiga, íris circular), glândulas exócrinas',
-          effects: ['Broncoconstrição', 'Miose (constrição pupilar)', '↑ Motilidade GI', '↑ Secreções (saliva, lágrimas, suor, muco brônquico)', 'Contração detrusor (micção)'],
-          drugs: ['Agonistas: Pilocarpina, Betanecol', 'Antagonistas: Atropina, Ipratrópio, Escopolamina'],
+          name: 'M3', coupling: 'Gq → ↑ IP₃/DAG → ↑ Ca²⁺',
+          location: 'Músculo liso (brônquios, bexiga [detrusor], endotélio vascular, TGI, útero), glândulas exócrinas, íris (M. constritor)',
+          effects: ['Broncoconstrição + broncorreia', 'Contração M. detrusor (micção) — estímulo miccional e fecal', 'Vasodilatação mediada por NO (produção endotelial)', 'Sudorese (glândulas sudoríparas)', 'Sialorréia (glândulas salivares)', 'Lacrimejamento', 'Miose (contração M. constritor da pupila)', 'Acomodação do cristalino', '↑ Motilidade TGI (peristalse)'],
+          drugs: ['Agonistas: Pilocarpina, Betanecol (seletivo M3), Carbacol', 'Antagonistas: Atropina, Ipratrópio (brônquios), Tiotrópio, Tropicamida (midriático)'],
+        },
+        {
+          name: 'M4 e M5', coupling: 'M4: Gi · M5: Gq',
+          location: 'SNC predominantemente',
+          effects: ['M4: inibição de neurônios no SNC (Gi)', 'M5: modulação da via dopaminérgica mesolímbica'],
+          drugs: ['Sem aplicação clínica relevante atualmente'],
         },
       ].map(r => (
-        <div key={r.name} style={{ background: '#111c2b', border: `1px solid ${r.color}44`, borderRadius: 10, padding: 18 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
-            <span style={{ fontSize: 20, fontWeight: 800, color: r.color, fontFamily: 'monospace' }}>Receptor {r.name}</span>
+        <div key={r.name} style={{ background: '#111c2b', border: '1px solid #27ae6044', borderRadius: 10, padding: 18 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 10, flexWrap: 'wrap' }}>
+            <span style={{ fontSize: 18, fontWeight: 800, color: '#27ae60', fontFamily: 'monospace' }}>Receptor {r.name}</span>
             <span style={{ fontSize: 11, color: '#6b7280', background: '#0d1117', borderRadius: 4, padding: '3px 8px' }}>{r.coupling}</span>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
             <div>
               <Label>Localização</Label>
-              <p style={{ margin: 0, fontSize: 12, color: '#8b949e', lineHeight: 1.6 }}>{r.location}</p>
-              <Label style={{ marginTop: 10 }}>Efeitos</Label>
+              <p style={{ margin: '0 0 10px', fontSize: 12, color: '#8b949e', lineHeight: 1.6 }}>{r.location}</p>
+              <Label>Efeitos</Label>
               <ul style={{ margin: 0, paddingLeft: 16 }}>
                 {r.effects.map((e, i) => <li key={i} style={{ fontSize: 12, color: '#c9d1d9', lineHeight: 1.8 }}>{e}</li>)}
               </ul>
             </div>
             <div>
-              <Label>Fármacos relevantes</Label>
-              {r.drugs.map((d, i) => (
-                <p key={i} style={{ margin: '0 0 4px', fontSize: 12, color: '#8b949e' }}>{d}</p>
-              ))}
+              <Label>Fármacos</Label>
+              {r.drugs.map((d, i) => <p key={i} style={{ margin: '0 0 6px', fontSize: 12, color: '#8b949e', lineHeight: 1.5 }}>{d}</p>)}
             </div>
           </div>
         </div>
       ))}
 
-      <SectionTitle>Nicotínicos</SectionTitle>
+      <SectionTitle>Receptores Nicotínicos</SectionTitle>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
         <div style={{ background: '#111c2b', border: '1px solid #27ae6044', borderRadius: 10, padding: 16 }}>
-          <span style={{ fontSize: 16, fontWeight: 700, color: '#27ae60' }}>Nn — Nicotínico Neuronal</span>
-          <p style={{ fontSize: 12, color: '#8b949e', margin: '8px 0 4px' }}>Canal iônico ligante-dependente (Na⁺/K⁺)</p>
-          <p style={{ fontSize: 12, color: '#8b949e', margin: '0 0 8px' }}><strong>Local:</strong> Gânglios autonômicos (simpáticos e parassimpáticos), medula adrenal</p>
-          <p style={{ fontSize: 12, color: '#c9d1d9', margin: 0 }}>Estimulação ganglionar → transmissão autonômica; liberação de adrenalina/NA pela medula adrenal</p>
+          <span style={{ fontSize: 15, fontWeight: 700, color: '#27ae60' }}>Nn — Nicotínico Neuronal</span>
+          <p style={{ fontSize: 12, color: '#8b949e', margin: '8px 0 4px' }}>Canal iônico de Na⁺/K⁺ (ionotrópico)</p>
+          <p style={{ fontSize: 12, color: '#8b949e', margin: '0 0 8px' }}><strong>Local:</strong> Gânglios autonômicos, região medular das glândulas suprarrenais, SNC</p>
+          <ul style={{ margin: 0, paddingLeft: 16 }}>
+            <li style={{ fontSize: 12, color: '#c9d1d9', lineHeight: 1.8 }}>Estimulação do neurônio pós-ganglionar</li>
+            <li style={{ fontSize: 12, color: '#c9d1d9', lineHeight: 1.8 }}>Liberação de catecolaminas pela medula suprarrenal</li>
+          </ul>
         </div>
         <div style={{ background: '#111c2b', border: '1px solid #27ae6044', borderRadius: 10, padding: 16 }}>
-          <span style={{ fontSize: 16, fontWeight: 700, color: '#27ae60' }}>Nm — Nicotínico Muscular</span>
-          <p style={{ fontSize: 12, color: '#8b949e', margin: '8px 0 4px' }}>Canal iônico ligante-dependente (Na⁺/K⁺)</p>
+          <span style={{ fontSize: 15, fontWeight: 700, color: '#27ae60' }}>Nm — Nicotínico Muscular</span>
+          <p style={{ fontSize: 12, color: '#8b949e', margin: '8px 0 4px' }}>Canal iônico de Na⁺/K⁺ (ionotrópico)</p>
           <p style={{ fontSize: 12, color: '#8b949e', margin: '0 0 8px' }}><strong>Local:</strong> Junção neuromuscular (placa motora)</p>
-          <p style={{ fontSize: 12, color: '#c9d1d9', margin: 0 }}>Contração do músculo esquelético. Bloqueado por curarizantes (bloqueadores neuromusculares).</p>
+          <ul style={{ margin: 0, paddingLeft: 16 }}>
+            <li style={{ fontSize: 12, color: '#c9d1d9', lineHeight: 1.8 }}>Despolarização da placa motora → contração muscular</li>
+            <li style={{ fontSize: 12, color: '#c9d1d9', lineHeight: 1.8 }}>Bloqueado por curarizantes (bloqueadores neuromusculares)</li>
+          </ul>
         </div>
       </div>
 
-      <Mnemonic color="#27ae60" title="Mnemônico SLUDGE — Síndrome Colinérgica">
+      <Mnemonic color="#27ae60" title="Mnemônico SLUDGE — Síndrome Colinérgica (excesso muscarínico)">
         <ul style={{ margin: '0 0 10px', paddingLeft: 18 }}>
           {[
-            <><strong>S</strong>alivação excessiva</>,
+            <><strong>S</strong>alivação excessiva (sialorréia)</>,
             <><strong>L</strong>acrimejamento</>,
             <><strong>U</strong>rinação involuntária</>,
             <><strong>D</strong>efecação / Diarreia</>,
-            <><strong>G</strong>I — cólicas, náusea, vômito</>,
+            <><strong>G</strong>I — cólicas, náuseas, vômito, hipermotilidade</>,
             <><strong>E</strong>mese (vômito)</>,
           ].map((item, i) => <li key={i} style={{ lineHeight: 1.9, fontSize: 12, color: '#c9d1d9' }}>{item}</li>)}
         </ul>
-        <p style={{ margin: 0, fontSize: 12, color: '#8b949e', lineHeight: 1.6 }}>
-          Causado por anticolinesterásicos (neostigmina, fisostigmina, organofosforados) ou agonistas
-          muscarínicos em excesso. Antídoto: <strong style={{ color: '#27ae60' }}>Atropina</strong>.
+        <p style={{ margin: '0 0 6px', fontSize: 12, color: '#8b949e', lineHeight: 1.6 }}>
+          + Broncoconstrição, bradicardia, miose, hipotensão.<br/>
+          <strong>Causas:</strong> organofosforados, anticolinesterásicos, agonistas muscarínicos em excesso, aldicarb (chumbinho).<br/>
+          <strong>Antídoto:</strong> <span style={{ color: '#27ae60' }}>Atropina</span> + Pralidoxima (regenerador enzimático para organofosforados).
         </p>
       </Mnemonic>
     </div>
   );
 }
 
-// ─── SEÇÃO DE FÁRMACOS (genérica) ────────────────────────────────────────────
-function DrugSection({ cls, color }: { cls: string; color: string }) {
-  const list = drugs.filter(d => d.class === cls);
+// ─── AGONISTAS ADRENÉRGICOS ───────────────────────────────────────────────────
+function AgonAdren() {
+  const items = [
+    { name: 'Epinefrina (Adrenalina)', rec: 'α1, α2, β1, β2', sub: 'Catecolamina endógena não seletiva',
+      mec: 'Agonista direto de todos os receptores adrenérgicos.',
+      uso: 'PCR, choque anafilático (antagonista fisiológico da histamina), prolongação de anestesia local (vasoconstrição).',
+      ec: 'Hipertensão arterial, taquicardia, necrose de extremidades (não usar em nariz, dedos — vasoconstrição isquêmica).', color: '#e67e22' },
+    { name: 'Norepinefrina (Noradrenalina)', rec: 'α1, α2, β1', sub: 'Catecolamina endógena α/β1',
+      mec: 'Agonista α1, α2 e β1; sem ação β2 significativa.',
+      uso: 'Choque séptico (↑ PA, ↓ vasodilatação) e cardiogênico (menor risco de arritmias). CONTRAINDICADA no choque anafilático (sem β2).',
+      ec: 'Hipertensão sistólica e diastólica, necrose de pele e mucosas, bradicardia reflexa (compensada pelo β1).', color: '#e67e22' },
+    { name: 'Dopamina', rec: 'D1–D5, β1, α1', sub: 'Catecolamina dose-dependente',
+      mec: 'D1/D2 em baixas doses (vasodilatação renal); β1 em doses médias; α1 em altas doses (vasoconstrição).',
+      uso: 'Choque, insuficiência cardíaca, hipotensão refratária.',
+      ec: 'Náusea, vômitos, taquicardia, angina, hipertensão.', color: '#e67e22' },
+    { name: 'Dobutamina', rec: 'β1 (seletivo)', sub: 'Agonista β1 sintético',
+      mec: 'Agonista seletivo β1; inotrópico positivo com menor cronotropismo.',
+      uso: 'Choque cardiogênico, ICC (última escolha para ↑ débito cardíaco).',
+      ec: 'Agitação, taquicardia, tremores, hiperglicemia, hipopotassemia.', color: '#e67e22' },
+    { name: 'Isoproterenol (Isoprelanila)', rec: 'β1, β2', sub: 'Agonista β não seletivo',
+      mec: 'Agonista β1 + β2, sem ação α.',
+      uso: 'Bradicardia, bloqueio de ramo, arritmias. CONTRAINDICADO: asma (apesar de broncodilatação, causa isquemia cardíaca) e IC aguda.',
+      ec: 'Taquicardia, agitação, nervosismo, hiperglicemia, hipopotassemia, hipotensão periférica.', color: '#e67e22' },
+    { name: 'Salbutamol (Albuterol / Aerolin)', rec: 'β2 (seletivo)', sub: 'Agonista β2 — curta ação (4–6h)',
+      mec: 'Agonista β2 seletivo; início de ação: 5–8 min.',
+      uso: 'Broncoespasmo, asma (broncodilatação), tocolítico (parto prematuro).',
+      ec: 'Taquicardia (receptores β2 no coração), tremor, hipocalemia (influxo K⁺ muscular), hiperglicemia.', color: '#e67e22' },
+    { name: 'Salmeterol', rec: 'β2 (seletivo)', sub: 'Agonista β2 — longa ação (>12h)',
+      mec: 'Broncodilatador de longa duração.',
+      uso: 'Manutenção da asma e DPOC.', ec: 'Semelhante ao salbutamol, porém menos pronunciados.', color: '#e67e22' },
+    { name: 'Fenilefrina', rec: 'α1 (seletivo)', sub: 'Agonista α1 sintético',
+      mec: 'Vasoconstritor; midriático que não causa cicloplegia.',
+      uso: 'Descongestionante nasal, taquicardia supraventricular, midríase, priapismo (vasoconstrição).',
+      ec: 'Bradicardia reflexa, hipertensão, anosmia (uso nasal prolongado).', color: '#e67e22' },
+    { name: 'Clonidina', rec: 'α2 (central)', sub: 'Agonista α2 — anti-hipertensivo central',
+      mec: 'Estimula α2 central → ↓ tônus simpático → ↓ PA.',
+      uso: 'Hipertensão arterial, pré-anestésico, analgésico.',
+      ec: 'Sedação, boca seca, hipotensão ortostática, tontura, disfunção sexual.', color: '#e67e22' },
+    { name: 'Efedrina', rec: 'α, β e SNC', sub: 'Agonista misto (direta + indireta)',
+      mec: 'Ação direta em α e β + libera NE e inibe sua recaptação.',
+      uso: 'Broncodilatação (asma), descongestionante nasal.',
+      ec: 'Hipertensão, taquicardia, IAM, midríase, insônia, ansiedade.', color: '#e67e22' },
+    { name: 'Mirabegron', rec: 'β3 (seletivo)', sub: 'Agonista β3',
+      mec: 'Relaxa o M. detrusor da bexiga via β3.',
+      uso: 'Bexiga hiperativa, incontinência urinária.',
+      ec: 'Hipertensão, taquicardia.', color: '#e67e22' },
+  ];
+  return <DrugList items={items} />;
+}
+
+// ─── BLOQUEADORES ADRENÉRGICOS ────────────────────────────────────────────────
+function BloqAdren() {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-      {list.map(drug => (
-        <div key={drug.id} style={{ background: '#111c2b', border: `1px solid ${color}33`, borderRadius: 10, padding: 18 }}>
-          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 10 }}>
-            <div>
-              <span style={{ fontSize: 16, fontWeight: 700, color }}>{drug.name}</span>
-              {drug.genericName !== drug.name && (
-                <span style={{ fontSize: 11, color: '#6b7280', marginLeft: 8 }}>({drug.genericName})</span>
-              )}
-              <p style={{ margin: '4px 0 0', fontSize: 11, color: '#6b7280' }}>{drug.subclass}</p>
-            </div>
-            <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
-              {drug.receptors.map(r => (
-                <span key={r} style={{ fontSize: 10, fontWeight: 700, color, background: `${color}18`, border: `1px solid ${color}44`, borderRadius: 4, padding: '2px 7px', fontFamily: 'monospace' }}>{r}</span>
-              ))}
-            </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+
+      <SectionTitle>Bloqueadores α-Adrenérgicos</SectionTitle>
+      <InfoBox color="#95a5a6">
+        Bloqueiam receptores α, favorecendo vasodilatação e ↓ resistência vascular periférica.
+        Efeitos adversos comuns: hipotensão ortostática, taquicardia reflexa, congestão nasal, ejaculação retrógrada.
+      </InfoBox>
+
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+        {[
+          { name: 'Fenoxibenzamina', rec: 'α1 + α2', type: 'Não seletivo — IRREVERSÍVEL',
+            uso: 'Feocromocitoma (↓ PA por inibição da vasoconstrição). EC: taquicardia reflexa, hipotensão postural, congestão nasal.' },
+          { name: 'Fentolamina', rec: 'α1 + α2', type: 'Não seletivo — REVERSÍVEL',
+            uso: 'Feocromocitoma, disfunção erétil. EC: compartilha com fenoxibenzamina.' },
+          { name: 'Prazosina', rec: 'α1 (todos subtipos)', type: 'α1 seletivo',
+            uso: 'HAS, Hiperplasia Prostática Benigna (HPB). EC: síncope na 1ª dose, taquicardia reflexa, hipotensão ortostática.' },
+          { name: 'Terazosina', rec: 'α1', type: 'α1 seletivo',
+            uso: 'HPB + HAS. Não urosseletiva. EC: semelhante à prazosina.' },
+          { name: 'Doxazosina', rec: 'α1', type: 'α1 seletivo (análogo da prazosina)',
+            uso: 'HPB + HAS. EC: semelhante à prazosina.' },
+          { name: 'Tansulosina', rec: 'α1A (próstata)', type: 'α1A seletivo — UROSSELETIVO',
+            uso: 'HPB. Menos efeitos cardiovasculares.' },
+          { name: 'Silodosina', rec: 'α1A (próstata)', type: 'α1A seletivo — UROSSELETIVO',
+            uso: 'HPB. Menos efeitos cardiovasculares que a tansulosina.' },
+        ].map(({ name, rec, type, uso }) => (
+          <div key={name} style={{ background: '#111c2b', border: '1px solid #95a5a644', borderRadius: 8, padding: '12px 14px' }}>
+            <div style={{ color: '#95a5a6', fontWeight: 700, fontSize: 13 }}>{name}</div>
+            <div style={{ color: '#6b7280', fontSize: 11, margin: '2px 0 6px' }}>{type} · {rec}</div>
+            <p style={{ margin: 0, fontSize: 12, color: '#8b949e', lineHeight: 1.6 }}>{uso}</p>
           </div>
-          <p style={{ margin: '0 0 12px', fontSize: 12, color: '#8b949e', lineHeight: 1.6 }}>{drug.mechanism}</p>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 6 }}>
-            {[
-              { label: 'FC', value: drug.effects.heartRate, unit: '%' },
-              { label: 'PAS', value: drug.effects.systolicBP, unit: '%' },
-              { label: 'Brônquio', value: drug.effects.bronchialDiameter, unit: '%' },
-              { label: 'Pupila', value: drug.effects.pupilDilation, unit: '%' },
-              { label: 'TGI', value: drug.effects.giMotility, unit: '%' },
-            ].map(({ label, value, unit }) => (
-              <div key={label} style={{ background: '#0d1117', borderRadius: 6, padding: '6px 8px', textAlign: 'center' }}>
-                <div style={{ fontSize: 9, color: '#4d6a7a', marginBottom: 2, textTransform: 'uppercase' }}>{label}</div>
-                <div style={{ fontSize: 13, fontWeight: 700, fontFamily: 'monospace', color: value > 0 ? '#2ecc71' : value < 0 ? '#e74c3c' : '#6b7280' }}>
-                  {value > 0 ? '+' : ''}{value}{unit}
-                </div>
+        ))}
+      </div>
+      <Mnemonic color="#95a5a6" title="Mnemônico — α1 seletivos">
+        <p style={{ margin: 0, fontSize: 13, color: '#c9d1d9', letterSpacing: '0.05em' }}>
+          <strong>Pra</strong>zosina · <strong>Tera</strong>zosina · <strong>Doxa</strong>zosina · <strong>Al</strong>fuzosina · <strong>Tan</strong>sulosina · <strong>Silo</strong>dosina
+        </p>
+        <p style={{ margin: '6px 0 0', fontSize: 12, color: '#6b7280' }}>→ PraTeraDoxa AlTanSilo</p>
+      </Mnemonic>
+
+      <SectionTitle>Bloqueadores β-Adrenérgicos (Beta-bloqueadores)</SectionTitle>
+      <InfoBox color="#95a5a6">
+        Usos: HAS, insuficiência cardíaca, angina pectoris, arritmias, glaucoma, enxaqueca (propranolol), tremores, ansiedade somática.<br/>
+        Contraindicações: asma / DPOC (broncoconstrição), síndrome de Raynaud, diabetes (mascara hipoglicemia, retarda recuperação), bloqueio AV de 2º/3º grau.<br/>
+        ASI = <em>Atividade Simpaticomimética Intrínseca</em>: agonismo parcial → menor bradicardia em repouso.
+      </InfoBox>
+
+      {[
+        {
+          gen: '1ª Geração — β não seletivos (β1 + β2)', color: '#95a5a6',
+          drugs: [
+            { name: 'Propranolol', detail: 'Protótipo. Lipofílico, atravessa BHE → trata enxaqueca, tremores, ansiedade. Efeito estabilizador de membrana. Sem ASI.' },
+            { name: 'Pindolol', detail: 'Possui ASI em β2. Mantém estímulo basal → menos bradicardia e débito cardíaco não reduzido em repouso.' },
+            { name: 'Nadolol', detail: 'Anti-hipertensivo, baixa lipossolubilidade, excreção renal. HAS + angina pectoris. Profilaxia hemorragia varicosa esofágica (com propranolol).' },
+            { name: 'Timolol', detail: 'Hipotensor ocular (glaucoma de ângulo aberto). Também usado na HAS e ICC.' },
+          ],
+        },
+        {
+          gen: '2ª Geração — β1 seletivos / Cardioseletivos', color: '#3498db',
+          drugs: [
+            { name: 'Atenolol', detail: 'Protótipo dos cardioseletivos. Sem ASI. HAS, doença coronariana, arritmias, angina, pós-infarto.' },
+            { name: 'Metoprolol', detail: 'Sem ASI. HAS, taquicardia, ICC crônica, angina, pós-infarto.' },
+            { name: 'Esmolol', detail: 'Início rápido, curta duração. Emergências: controle de arritmias e HAS pós-operatória grave.' },
+            { name: 'Acebutolol', detail: 'Possui ASI. HAS, arritmias, infarto agudo do miocárdio.' },
+            { name: 'Bisoprolol', detail: 'Altamente seletivo β1. HAS + ICC moderada a grave. Metabolismo renal e hepático.' },
+          ],
+        },
+        {
+          gen: '3ª Geração β não seletivos — com ações adicionais', color: '#e67e22',
+          drugs: [
+            { name: 'Labetalol', detail: 'Bloqueia α1 + β1 + β2 (ASI β2). Vasodilatação + ↓ broncoconstrição. HAS leve a moderada, HAS do parto, emergências hipertensivas. Não usar em asmáticos.' },
+            { name: 'Carvedilol', detail: 'Bloqueia α1 + β (sem ASI). Antioxidante. ICC crônica (↓ mortalidade). EC: broncoconstrição, bradicardia, hipoglicemia.' },
+            { name: 'Bucindolol', detail: 'Fraca ação α1 + ASI em β1. Menor bradicardia. ICC.' },
+            { name: 'Carteolol', detail: 'ASI em β2. Hipotensor ocular, produz NO.' },
+          ],
+        },
+        {
+          gen: '3ª Geração β1 seletivos — com ações adicionais', color: '#2ecc71',
+          drugs: [
+            { name: 'Betaxolol', detail: 'Sem ASI, bloqueia Ca²⁺. Glaucoma de ângulo aberto, HAS, angina. Mais seguro em asmáticos (cardioseletivo).' },
+            { name: 'Celiprolol', detail: 'ASI em β2 → broncodilatação. Vasodilatação via NO. Antiarrítmico, HAS, angina.' },
+            { name: 'Nebivolol', detail: 'Vasodilatação via NO. Antioxidante. HAS, proteção cardíaca pós-falência ventricular.' },
+          ],
+        },
+      ].map(({ gen, color, drugs }) => (
+        <div key={gen} style={{ background: '#111c2b', border: `1px solid ${color}33`, borderRadius: 10, padding: '14px 18px' }}>
+          <div style={{ color, fontWeight: 700, fontSize: 13, marginBottom: 12 }}>{gen}</div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {drugs.map(({ name, detail }) => (
+              <div key={name} style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
+                <span style={{ color, fontWeight: 700, fontSize: 12, minWidth: 110, flexShrink: 0 }}>{name}</span>
+                <span style={{ fontSize: 12, color: '#8b949e', lineHeight: 1.6 }}>{detail}</span>
               </div>
             ))}
           </div>
-          {(drug.effects.sweating > 0.3 || drug.effects.salivation > 0.3 || drug.effects.lacrimation > 0.3 || drug.effects.tremor > 0.3) && (
-            <div style={{ display: 'flex', gap: 6, marginTop: 10, flexWrap: 'wrap' }}>
-              {drug.effects.sweating   > 0.3 && <Tag color="#7fc8f8">Sudorese</Tag>}
-              {drug.effects.salivation > 0.3 && <Tag color="#7fc8f8">Sialorréia</Tag>}
-              {drug.effects.lacrimation> 0.3 && <Tag color="#7fc8f8">Lacrimejamento</Tag>}
-              {drug.effects.tremor     > 0.3 && <Tag color="#e67e22">Tremor</Tag>}
-              {drug.effects.sweating  < -0.3 && <Tag color="#f39c12">Anhidrose</Tag>}
-              {drug.effects.salivation< -0.3 && <Tag color="#f39c12">Boca seca</Tag>}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ─── AGONISTAS COLINÉRGICOS ───────────────────────────────────────────────────
+function AgonColin() {
+  const items = [
+    { name: 'Acetilcolina (ACh)', rec: 'M1–M5, Nm, Nn', sub: 'Agonista endógeno — ação direta',
+      mec: 'Neurotransmissor colinérgico endógeno. Não utilizada clinicamente — rapidamente degradada pelas enzimas plasmáticas.',
+      uso: 'Uso experimental e diagnóstico.', ec: 'Síndrome colinérgica completa (SLUDGE + bradicardia + broncoconstrição).', color: '#27ae60', bhe: '—' },
+    { name: 'Betanecol', rec: 'M1, M2, M3', sub: 'Éster de colina — ação direta',
+      mec: 'Agonista muscarínico, especialmente M3. Estimula peristalse TGI e contração detrusor.',
+      uso: 'Atonia intestinal (íleo paralítico pós-operatório), retenção urinária. Não atravessa BHE.',
+      ec: 'Diarreia, cólicas, náuseas.', color: '#27ae60', bhe: 'Não atravessa BHE' },
+    { name: 'Carbacol', rec: 'M + N', sub: 'Éster de colina — resistente à AChE',
+      mec: 'Resistente à acetilcolinesterase. Pode estimular receptores nicotínicos.',
+      uso: 'Glaucoma (reduz PIO + miose), cirurgia de catarata, esvaziamento vesical. Não atravessa BHE.',
+      ec: 'Bradicardia, hipotensão, sudorese, sialorreia.', color: '#27ae60', bhe: 'Não atravessa BHE' },
+    { name: 'Pilocarpina', rec: 'M1, M2, M3', sub: 'Alcaloide natural — ação direta',
+      mec: 'Agonista muscarínico. Contrai M. ciliar → drenagem humor aquoso. Amina terciária.',
+      uso: 'Glaucoma (↓ pressão intraocular), xerostomia (boca seca), síndrome de Sjögren.',
+      ec: 'Náuseas, sudorese, vômitos, diarreia, broncoconstrição, incontinência urinária.', color: '#27ae60', bhe: 'Atravessa BHE' },
+    { name: 'Muscarina', rec: 'M1–M5', sub: 'Alcaloide natural — ação direta',
+      mec: 'Agonista muscarínico. Imita a síndrome colinérgica. Única amina quaternária que atravessa BHE.',
+      uso: 'Sem uso clínico — presente em cogumelos venenosos.', ec: 'Síndrome colinérgica completa.', color: '#27ae60', bhe: 'Atravessa BHE (único amônio quaternário)' },
+    { name: 'Neostigmina', rec: 'AChE (indireto)', sub: 'Anticolinesterásico — carbamato reversível',
+      mec: 'Inibe AChE reversivelmente → ↑ ACh. Não atravessa BHE.',
+      uso: 'Reversão de bloqueio neuromuscular (anestesias), miastenia gravis.',
+      ec: 'SLUDGE, broncoespasmo, bradicardia.', color: '#27ae60', bhe: 'Não atravessa BHE' },
+    { name: 'Fisostigmina (Eserina)', rec: 'AChE (indireto)', sub: 'Anticolinesterásico — carbamato reversível',
+      mec: 'Inibe AChE reversivelmente. Atravessa BHE — efeitos centrais.',
+      uso: 'Intoxicação por atropina (antídoto), glaucoma.',
+      ec: 'SLUDGE + efeitos centrais (convulsão em overdose).', color: '#27ae60', bhe: 'Atravessa BHE' },
+    { name: 'Edrofônio', rec: 'AChE (indireto)', sub: 'Anticolinesterásico reversível — curta duração',
+      mec: 'Inibe AChE por 2–10 minutos. Não atravessa BHE.',
+      uso: 'Diagnóstico de miastenia gravis (teste do edrofônio).',
+      ec: 'Bradicardia transitória, fasciculações.', color: '#27ae60', bhe: 'Não atravessa BHE' },
+    { name: 'Piridostigmina', rec: 'AChE (indireto)', sub: 'Anticolinesterásico — carbamato reversível',
+      mec: 'Inibe AChE. Não atravessa BHE.',
+      uso: 'Miastenia gravis (tratamento de longo prazo).',
+      ec: 'SLUDGE (menos intenso que neostigmina).', color: '#27ae60', bhe: 'Não atravessa BHE' },
+    { name: 'Rivastigmina', rec: 'AChE (indireto)', sub: 'Anticolinesterásico — Alzheimer',
+      mec: 'Inibe AChE e BuChE. Atravessa BHE.',
+      uso: 'Doença de Alzheimer (↑ ACh no SNC → melhora cognitiva).',
+      ec: 'Náuseas, vômitos, diarreia.', color: '#27ae60', bhe: 'Atravessa BHE' },
+    { name: 'Donepezil', rec: 'AChE (indireto)', sub: 'Anticolinesterásico — Alzheimer',
+      mec: 'Inibe AChE seletivamente no SNC. Atravessa BHE.',
+      uso: 'Doença de Alzheimer.', ec: 'Náuseas, diarreia, insônia.', color: '#27ae60', bhe: 'Atravessa BHE' },
+  ];
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+      <InfoBox color="#27ae60">
+        Agonistas colinérgicos de <strong>ação direta</strong>: ativam receptores M e/ou N. Ação <strong>indireta</strong>: inibem a AChE → ↑ ACh disponível.
+        Aminas <strong>quaternárias</strong> geralmente não atravessam BHE (exceção: muscarina). Aminas <strong>terciárias</strong> atravessam BHE.
+      </InfoBox>
+      {items.map(drug => (
+        <div key={drug.name} style={{ background: '#111c2b', border: `1px solid ${drug.color}33`, borderRadius: 10, padding: 16 }}>
+          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 8, flexWrap: 'wrap', gap: 6 }}>
+            <div>
+              <span style={{ color: drug.color, fontWeight: 700, fontSize: 14 }}>{drug.name}</span>
+              <span style={{ fontSize: 11, color: '#6b7280', marginLeft: 8 }}>{drug.sub}</span>
             </div>
-          )}
+            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+              <Pill color={drug.color}>{drug.rec}</Pill>
+              <Pill color={drug.bhe.startsWith('Não') ? '#e74c3c' : drug.bhe === '—' ? '#6b7280' : '#2ecc71'}>
+                {drug.bhe}
+              </Pill>
+            </div>
+          </div>
+          <p style={{ margin: '0 0 4px', fontSize: 12, color: '#8b949e', lineHeight: 1.5 }}><strong style={{ color: '#c9d1d9' }}>Mec:</strong> {drug.mec}</p>
+          <p style={{ margin: '0 0 4px', fontSize: 12, color: '#8b949e', lineHeight: 1.5 }}><strong style={{ color: '#2ecc71' }}>Uso:</strong> {drug.uso}</p>
+          <p style={{ margin: 0, fontSize: 12, color: '#8b949e', lineHeight: 1.5 }}><strong style={{ color: '#e74c3c' }}>EC:</strong> {drug.ec}</p>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ─── BLOQUEADORES COLINÉRGICOS ────────────────────────────────────────────────
+function BloqColin() {
+  const items = [
+    { name: 'Atropina', rec: 'M1, M2, M3', sub: 'Alcaloide natural — antagonista direto',
+      mec: 'Antagonismo competitivo em todos os receptores muscarínicos. Atravessa BHE.',
+      uso: 'Bradicardia sinusal, midríase (diagnóstico), antídoto da crise colinérgica (organofosforados, aldicarb).',
+      ec: 'Taquicardia, boca seca (xerostomia), retenção urinária, constipação, midríase, hipertermia (↓ sudorese), agitação (SNC).', color: '#8e44ad', bhe: 'Atravessa BHE' },
+    { name: 'Escopolamina (Hioscina)', rec: 'M1, M2, M3', sub: 'Alcaloide — efeito sedativo central',
+      mec: 'Antagonista muscarínico. Atravessa BHE → amnesia e sedação. Buscopan = hioscina levogiro.',
+      uso: 'Cinetose (náuseas/vômitos — M1), dismenorreia, cólicas abdominais (↓ motilidade TGI).',
+      ec: 'Sonolência, amnesia, boca seca, visão embaçada, retenção urinária.', color: '#8e44ad', bhe: 'Atravessa BHE' },
+    { name: 'Glicopirrolato', rec: 'M1, M2, M3', sub: 'Amônio quaternário — sem efeito central',
+      mec: 'Antagonista muscarínico. Não atravessa BHE — sem efeitos no SNC.',
+      uso: 'Espasmos do TGI, reverter bradicardia (intraoperatória), adjuvante com neostigmina.',
+      ec: 'Boca seca, taquicardia, constipação, retenção urinária.', color: '#8e44ad', bhe: 'Não atravessa BHE' },
+    { name: 'Ipratrópio', rec: 'M1, M2, M3', sub: 'Amônio quaternário — uso inalatório',
+      mec: 'Antagonista M3 local nos brônquios. Pouca absorção sistêmica. Inibe broncorreia e broncoconstrição.',
+      uso: 'Asma, bronquite crônica, enfisema, DPOC.',
+      ec: 'Boca seca, congestão nasal (mínimos efeitos sistêmicos).', color: '#8e44ad', bhe: 'Não atravessa BHE' },
+    { name: 'Tiotrópio', rec: 'M1, M2, M3', sub: 'Amônio quaternário — longa ação',
+      mec: 'Broncodilatador de longa ação: 5–6 dias de duração.',
+      uso: 'DPOC (manutenção).', ec: 'Boca seca.', color: '#8e44ad', bhe: 'Não atravessa BHE' },
+    { name: 'Pirenzepina', rec: 'M1 (seletivo)', sub: 'Amina terciária — antipéptico',
+      mec: 'Bloqueia M1 gástrico → inibe liberação de HCl.',
+      uso: 'Úlcera péptica, gastrite hiperácida.', ec: 'Boca seca, visão embaçada (menos que atropina).', color: '#8e44ad', bhe: 'Atravessa BHE (mas menos) ' },
+    { name: 'Tropicamida', rec: 'M3 (olho)', sub: 'Amina terciária — midriático',
+      mec: 'Bloqueia M3 → midríase + cicloplegia (paralisia do M. ciliar). Curta duração.',
+      uso: 'Exame de fundo de olho, refração.', ec: 'Midríase, cicloplegia, visão turva temporária.', color: '#8e44ad', bhe: 'Atravessa BHE' },
+    { name: 'Ciclopentolato', rec: 'M3 (olho)', sub: 'Amina terciária — midriático',
+      mec: 'Semelhante à tropicamida — midríase + cicloplegia.',
+      uso: 'Exame de fundo de olho em crianças.', ec: 'Midríase, cicloplegia.', color: '#8e44ad', bhe: 'Atravessa BHE' },
+    { name: 'Oxibutinina', rec: 'M1, M3', sub: 'Amina terciária — antiespasmódico',
+      mec: 'Antiespasmódico do M. detrusor. Atravessa BHE.',
+      uso: 'Bexiga hiperativa, incontinência urinária.', ec: 'Xerostomia, visão embaçada, constipação, confusão mental (BHE).', color: '#8e44ad', bhe: 'Atravessa BHE' },
+    { name: 'Tolterodina', rec: 'M2, M3', sub: 'Amina terciária — incontinência',
+      mec: 'Antiespasmódico vesical.',
+      uso: 'Bexiga hiperativa.', ec: 'Xerostomia, visão embaçada, constipação.', color: '#8e44ad', bhe: 'Atravessa BHE' },
+    { name: 'Tróspio', rec: 'M3', sub: 'Amônio quaternário — incontinência segura',
+      mec: 'Antiespasmódico vesical. Não atravessa BHE → ideal para pacientes com Alzheimer.',
+      uso: 'Bexiga hiperativa em pacientes com declínio cognitivo.',
+      ec: 'Xerostomia, visão embaçada, constipação.', color: '#8e44ad', bhe: 'Não atravessa BHE' },
+    { name: 'Benztropina', rec: 'M (SNC)', sub: 'Amina terciária — antiparkinsoniano',
+      mec: 'Bloqueia receptores muscarínicos no SNC, reduzindo hiperatividade colinérgica na via nigroestriatal.',
+      uso: 'Doença de Parkinson (tremor = exacerbação colinérgica por ↓ dopamina).',
+      ec: 'Boca seca, constipação, retenção urinária, confusão.', color: '#8e44ad', bhe: 'Atravessa BHE' },
+  ];
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+      <InfoBox color="#8e44ad">
+        Bloqueadores colinérgicos (antimuscarínicos) <strong>reduzem efeitos parassimpáticos</strong> e exacerbam efeitos simpáticos.
+        Efeitos gerais: taquicardia, broncodilatação, midríase, cicloplegia, ↓ secreções, retenção urinária, ↓ motilidade TGI, sonolência.
+        Aminas terciárias atravessam BHE. Aminas quaternárias não atravessam (exceto muscarina).
+      </InfoBox>
+      {items.map(drug => (
+        <div key={drug.name} style={{ background: '#111c2b', border: `1px solid ${drug.color}33`, borderRadius: 10, padding: 16 }}>
+          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 8, flexWrap: 'wrap', gap: 6 }}>
+            <div>
+              <span style={{ color: drug.color, fontWeight: 700, fontSize: 14 }}>{drug.name}</span>
+              <span style={{ fontSize: 11, color: '#6b7280', marginLeft: 8 }}>{drug.sub}</span>
+            </div>
+            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+              <Pill color={drug.color}>{drug.rec}</Pill>
+              <Pill color={drug.bhe.startsWith('Não') ? '#e74c3c' : '#2ecc71'}>{drug.bhe}</Pill>
+            </div>
+          </div>
+          <p style={{ margin: '0 0 4px', fontSize: 12, color: '#8b949e', lineHeight: 1.5 }}><strong style={{ color: '#c9d1d9' }}>Mec:</strong> {drug.mec}</p>
+          <p style={{ margin: '0 0 4px', fontSize: 12, color: '#8b949e', lineHeight: 1.5 }}><strong style={{ color: '#2ecc71' }}>Uso:</strong> {drug.uso}</p>
+          <p style={{ margin: 0, fontSize: 12, color: '#8b949e', lineHeight: 1.5 }}><strong style={{ color: '#e74c3c' }}>EC:</strong> {drug.ec}</p>
         </div>
       ))}
     </div>
@@ -416,15 +719,15 @@ function InterSection() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
       <InfoBox color="#f39c12">
-        Interações ocorrem quando dois fármacos alteram mutuamente seus efeitos farmacodinâmicos.
-        Podem ser <strong>antagônicas</strong> (efeitos opostos), <strong>sinérgicas</strong> (efeitos somados) ou
-        causar <strong>reversão de efeito</strong> (bloqueio seletivo de um receptor muda o perfil do outro).
+        Interações farmacodinâmicas ocorrem quando dois fármacos alteram mutuamente seus efeitos nos receptores.
+        Podem ser <strong>antagônicas</strong>, <strong>sinérgicas</strong> ou causar <strong>reversão de efeito</strong>
+        (ex: bloqueio seletivo de um receptor expõe os efeitos do outro).
       </InfoBox>
       {sorted.map((inter, i) => {
         const s = sevStyle[inter.severity];
         return (
           <div key={i} style={{ background: s.bg, border: `1px solid ${s.border}`, borderRadius: 10, padding: '14px 18px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8, flexWrap: 'wrap' }}>
               <span style={{ fontSize: 11, fontWeight: 700, color: s.color, background: `${s.border}`, borderRadius: 4, padding: '2px 8px' }}>{s.badge}</span>
               <span style={{ fontWeight: 700, fontSize: 14, color: s.color }}>{inter.title}</span>
             </div>
@@ -433,7 +736,6 @@ function InterSection() {
                 const d = drugs.find(drug => drug.id === id);
                 return <Pill key={id} color={s.color}>{d?.name ?? id}</Pill>;
               })}
-              <span style={{ fontSize: 12, color: '#6b7280', alignSelf: 'center' }}>+ interação</span>
             </div>
             <p style={{ margin: 0, fontSize: 12, color: '#8b949e', lineHeight: 1.7 }}>{inter.description}</p>
           </div>
@@ -462,14 +764,9 @@ function SummaryTable() {
       <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 11 }}>
         <thead>
           <tr style={{ background: '#111c2b' }}>
-            <Th>Fármaco</Th>
-            <Th>Classe</Th>
-            <Th>Receptores</Th>
-            <Th color="#2ecc71">FC</Th>
-            <Th color="#e74c3c">PAS</Th>
-            <Th color="#3498db">Brônquio</Th>
-            <Th color="#f39c12">Pupila</Th>
-            <Th>TGI</Th>
+            <Th>Fármaco</Th><Th>Classe</Th><Th>Receptores</Th>
+            <Th color="#2ecc71">FC</Th><Th color="#e74c3c">PAS</Th>
+            <Th color="#3498db">Brônquio</Th><Th color="#f39c12">Pupila</Th><Th>TGI</Th>
           </tr>
         </thead>
         <tbody>
@@ -484,18 +781,10 @@ function SummaryTable() {
               <tr key={d.id}>
                 <td style={{ padding: '7px 10px', color, fontWeight: 600, background: i % 2 === 0 ? '#0d1117' : '#0e1622', whiteSpace: 'nowrap' }}>{d.name}</td>
                 <td style={{ padding: '7px 10px', background: i % 2 === 0 ? '#0d1117' : '#0e1622' }}>
-                  <span style={{ fontSize: 10, color, background: `${color}18`, border: `1px solid ${color}33`, borderRadius: 4, padding: '2px 6px', whiteSpace: 'nowrap' }}>
-                    {CLASS_LABEL[d.class]}
-                  </span>
+                  <span style={{ fontSize: 10, color, background: `${color}18`, border: `1px solid ${color}33`, borderRadius: 4, padding: '2px 6px', whiteSpace: 'nowrap' }}>{CLASS_LABEL[d.class]}</span>
                 </td>
-                <td style={{ padding: '7px 10px', color: '#6b7280', background: i % 2 === 0 ? '#0d1117' : '#0e1622' }}>
-                  {d.receptors.join(', ')}
-                </td>
-                {fmt(d.effects.heartRate)}
-                {fmt(d.effects.systolicBP)}
-                {fmt(d.effects.bronchialDiameter)}
-                {fmt(d.effects.pupilDilation)}
-                {fmt(d.effects.giMotility)}
+                <td style={{ padding: '7px 10px', color: '#6b7280', background: i % 2 === 0 ? '#0d1117' : '#0e1622' }}>{d.receptors.join(', ')}</td>
+                {fmt(d.effects.heartRate)}{fmt(d.effects.systolicBP)}{fmt(d.effects.bronchialDiameter)}{fmt(d.effects.pupilDilation)}{fmt(d.effects.giMotility)}
               </tr>
             );
           })}
@@ -505,10 +794,40 @@ function SummaryTable() {
   );
 }
 
+// ─── DRUG LIST HELPER ─────────────────────────────────────────────────────────
+function DrugList({ items }: { items: Array<{ name: string; rec: string; sub: string; mec: string; uso: string; ec: string; color: string; bhe?: string }> }) {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+      {items.map(drug => (
+        <div key={drug.name} style={{ background: '#111c2b', border: `1px solid ${drug.color}33`, borderRadius: 10, padding: 16 }}>
+          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 8, flexWrap: 'wrap', gap: 6 }}>
+            <div>
+              <span style={{ color: drug.color, fontWeight: 700, fontSize: 14 }}>{drug.name}</span>
+              <span style={{ fontSize: 11, color: '#6b7280', marginLeft: 8 }}>{drug.sub}</span>
+            </div>
+            <Pill color={drug.color}>{drug.rec}</Pill>
+          </div>
+          <p style={{ margin: '0 0 4px', fontSize: 12, color: '#8b949e', lineHeight: 1.5 }}><strong style={{ color: '#c9d1d9' }}>Mec:</strong> {drug.mec}</p>
+          <p style={{ margin: '0 0 4px', fontSize: 12, color: '#8b949e', lineHeight: 1.5 }}><strong style={{ color: '#2ecc71' }}>Uso:</strong> {drug.uso}</p>
+          <p style={{ margin: 0, fontSize: 12, color: '#8b949e', lineHeight: 1.5 }}><strong style={{ color: '#e74c3c' }}>EC:</strong> {drug.ec}</p>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 // ─── COMPONENTES AUXILIARES ───────────────────────────────────────────────────
 function InfoBox({ color, children }: { color: string; children: React.ReactNode }) {
   return (
     <div style={{ background: `${color}0d`, border: `1px solid ${color}33`, borderRadius: 8, padding: '12px 16px', fontSize: 13, color: '#c9d1d9', lineHeight: 1.7 }}>
+      {children}
+    </div>
+  );
+}
+
+function Note({ children }: { children: React.ReactNode }) {
+  return (
+    <div style={{ background: 'rgba(127,219,255,0.06)', border: '1px solid #7fdbff22', borderLeft: '3px solid #7fdbff55', borderRadius: 6, padding: '10px 14px', fontSize: 12, color: '#8b949e', lineHeight: 1.7 }}>
       {children}
     </div>
   );
@@ -544,15 +863,7 @@ function Label({ children, style }: { children: React.ReactNode; style?: React.C
 
 function Pill({ color, children }: { color: string; children: React.ReactNode }) {
   return (
-    <span style={{ fontSize: 11, color, background: `${color}18`, border: `1px solid ${color}44`, borderRadius: 12, padding: '2px 8px' }}>
-      {children}
-    </span>
-  );
-}
-
-function Tag({ color, children }: { color: string; children: React.ReactNode }) {
-  return (
-    <span style={{ fontSize: 10, color, background: `${color}15`, border: `1px solid ${color}44`, borderRadius: 4, padding: '2px 7px' }}>
+    <span style={{ fontSize: 11, color, background: `${color}18`, border: `1px solid ${color}44`, borderRadius: 12, padding: '2px 8px', whiteSpace: 'nowrap' }}>
       {children}
     </span>
   );
