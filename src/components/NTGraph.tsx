@@ -1,17 +1,27 @@
 import { useEffect, useRef } from 'react';
 import type { NTLevels } from '../types';
 
-interface Props { levels: NTLevels; }
+export interface NTLine {
+  key: keyof NTLevels;
+  label: string;
+  color: string;
+}
 
-const MAX_PTS  = 120;   // 120 pontos × ~0.5s = ~60s de histórico
-const FREQ     = 30;    // armazena a cada 30 frames (~0.5s a 60fps)
-const LERP     = 0.055; // velocidade de interpolação
+interface Props {
+  levels: NTLevels;
+  lines: NTLine[];
+  title: string;
+}
 
-const LINES = [
-  { key: 'ne'  as keyof NTLevels, label: 'Noradrenalina', color: '#e67e22' },
-  { key: 'ach' as keyof NTLevels, label: 'Acetilcolina',  color: '#2ecc71' },
-  { key: 'da'  as keyof NTLevels, label: 'Dopamina',      color: '#9b59b6' },
-  { key: 'epi' as keyof NTLevels, label: 'Adrenalina',    color: '#e74c3c' },
+const MAX_PTS  = 120;
+const FREQ     = 30;
+const LERP     = 0.055;
+
+export const ALL_LINES: NTLine[] = [
+  { key: 'ne',  label: 'Noradrenalina', color: '#e67e22' },
+  { key: 'ach', label: 'Acetilcolina',  color: '#2ecc71' },
+  { key: 'da',  label: 'Dopamina',      color: '#9b59b6' },
+  { key: 'epi', label: 'Adrenalina',    color: '#e74c3c' },
 ];
 
 function lerp(a: number, b: number, t: number) { return a + (b - a) * t; }
@@ -34,7 +44,7 @@ function smoothPath(ctx: CanvasRenderingContext2D, pts: { x: number; y: number }
   }
 }
 
-export default function NTGraph({ levels }: Props) {
+export default function NTGraph({ levels, lines, title }: Props) {
   const canvasRef   = useRef<HTMLCanvasElement>(null);
   const smoothRef   = useRef<NTLevels>({ ...levels });
   const historyRef  = useRef<NTLevels[]>(Array.from({ length: MAX_PTS }, () => ({ ...levels })));
@@ -96,7 +106,7 @@ export default function NTGraph({ levels }: Props) {
       ctx.beginPath(); ctx.moveTo(PL, yBase); ctx.lineTo(PL + pw, yBase); ctx.stroke();
 
       // ── Linhas dos neurotransmissores ──────────────────────
-      LINES.forEach(({ key, color }) => {
+      lines.forEach(({ key, color }) => {
         const pts = hist.map((snap, i) => ({
           x: PL + (i / (MAX_PTS - 1)) * pw,
           y: PT + ph - (snap[key] / 100) * ph,
@@ -163,7 +173,7 @@ export default function NTGraph({ levels }: Props) {
       {/* Título */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <span style={{ fontSize: 10, color: '#4d6a7a', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 600 }}>
-          Neurotransmissores
+          {title}
         </span>
         <span style={{ fontSize: 9, color: '#2a3a4a' }}>últimos 60s</span>
       </div>
@@ -178,8 +188,8 @@ export default function NTGraph({ levels }: Props) {
       </div>
 
       {/* Legenda */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4px 16px' }}>
-        {LINES.map(({ key, label, color }) => (
+      <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
+        {lines.map(({ key, label, color }) => (
           <div key={key} style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
             <span style={{
               width: 20, height: 2.5, borderRadius: 2,

@@ -16,6 +16,15 @@ import type { Scenario } from './data/scenarios';
 import { getActiveCritical, type CriticalThreshold } from './data/thresholds';
 import NTGraph from './components/NTGraph';
 import { calculateNTLevels } from './utils/pharmacology';
+
+const NT_SIMPATICO    = [
+  { key: 'ne'  as const, label: 'Noradrenalina', color: '#e67e22' },
+  { key: 'epi' as const, label: 'Adrenalina',    color: '#e74c3c' },
+];
+const NT_PARASSIMPATICO = [
+  { key: 'ach' as const, label: 'Acetilcolina',  color: '#2ecc71' },
+  { key: 'da'  as const, label: 'Dopamina',      color: '#9b59b6' },
+];
 import { useWindowWidth } from './hooks/useWindowWidth';
 
 let idCounter = 0;
@@ -209,9 +218,10 @@ export default function App() {
         {bodyState.pupilNormalized < 0.28 && <Badge text="Miose"         color="#3498db"/>}
       </div>
 
-      {/* Gráfico de neurotransmissores */}
-      <div style={{ width: '100%', maxWidth: 420, padding: '0 4px', flexShrink: 0 }}>
-        <NTGraph levels={ntLevels} />
+      {/* Gráficos de neurotransmissores */}
+      <div style={{ width: '100%', maxWidth: 460, padding: '0 4px', flexShrink: 0, display: 'flex', flexDirection: 'column', gap: 14 }}>
+        <NTGraph levels={ntLevels} lines={NT_SIMPATICO}     title="Simpático — Catecolaminas" />
+        <NTGraph levels={ntLevels} lines={NT_PARASSIMPATICO} title="Parassimpático — ACh / Dopamina" />
       </div>
     </div>
   );
