@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
+import { QRCodeSVG } from 'qrcode.react';
 import type { ActiveDrug, Drug } from './types';
 import { calculateVitals, calculateBodyState } from './utils/pharmacology';
 import { getActiveInteractions } from './data/interactions';
@@ -350,23 +351,51 @@ function SobreSection() {
     <div style={{ flex: 1, overflowY: 'auto', background: 'var(--bg)', padding: '32px 24px', display: 'flex', justifyContent: 'center' }}>
       <div style={{ maxWidth: 680, width: '100%', display: 'flex', flexDirection: 'column', gap: 24 }}>
 
-        <div style={{ background: '#111c2b', border: '1px solid #2ecc7133', borderRadius: 14, padding: '24px 28px' }}>
-          <div style={{ fontSize: 11, color: '#2ecc71', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 600, marginBottom: 10 }}>
-            Desenvolvido por
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+
+          {/* Desenvolvido por */}
+          <div style={{ background: '#111c2b', border: '1px solid #2ecc7133', borderRadius: 14, padding: '24px 22px' }}>
+            <div style={{ fontSize: 11, color: '#2ecc71', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 600, marginBottom: 10 }}>
+              Desenvolvido por
+            </div>
+            <div style={{ fontSize: 20, fontWeight: 700, color: '#e6edf3', marginBottom: 4 }}>Cláudio Rocha</div>
+            <div style={{ fontSize: 12, color: '#8b949e', marginBottom: 16, lineHeight: 1.7 }}>
+              Estudante de Medicina · 3º Período · Turma 158<br/>
+              Universidade Federal de Pernambuco — UFPE
+            </div>
+            <a href="mailto:claudio.filho@ufpe.br" style={{
+              display: 'inline-flex', alignItems: 'center', gap: 8,
+              background: '#2ecc7115', border: '1px solid #2ecc7144',
+              borderRadius: 7, padding: '7px 14px',
+              color: '#2ecc71', fontSize: 12, textDecoration: 'none', fontWeight: 500,
+            }}>
+              claudio.filho@ufpe.br
+            </a>
           </div>
-          <div style={{ fontSize: 22, fontWeight: 700, color: '#e6edf3', marginBottom: 4 }}>Cláudio Rocha</div>
-          <div style={{ fontSize: 13, color: '#8b949e', marginBottom: 16, lineHeight: 1.6 }}>
-            Estudante de Medicina · 3º Período · Turma 158<br/>
-            Universidade Federal de Pernambuco — UFPE
+
+          {/* Apoie este projeto */}
+          <div style={{ background: '#111c2b', border: '1px solid #f39c1233', borderRadius: 14, padding: '24px 22px', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+            <div style={{ fontSize: 11, color: '#f39c12', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 600, marginBottom: 10 }}>
+              Apoie este projeto
+            </div>
+            <div style={{ background: 'white', borderRadius: 10, padding: 10, marginBottom: 12 }}>
+              <QRCodeSVG value="13370451441" size={110} bgColor="#ffffff" fgColor="#0d1117" level="M"/>
+            </div>
+            <div style={{ fontSize: 11, color: '#8b949e', marginBottom: 8 }}>Chave PIX</div>
+            <div style={{
+              background: '#0d1117', border: '1px solid #f39c1244',
+              borderRadius: 6, padding: '6px 12px',
+              color: '#f39c12', fontSize: 13, fontFamily: 'monospace', fontWeight: 600,
+              letterSpacing: '0.05em', cursor: 'pointer',
+            }}
+              onClick={() => navigator.clipboard?.writeText('13370451441')}
+              title="Clique para copiar"
+            >
+              13370451441
+            </div>
+            <div style={{ fontSize: 10, color: '#4d6a7a', marginTop: 6 }}>clique na chave para copiar</div>
           </div>
-          <a href="mailto:claudio.filho@ufpe.br" style={{
-            display: 'inline-flex', alignItems: 'center', gap: 8,
-            background: '#2ecc7115', border: '1px solid #2ecc7144',
-            borderRadius: 7, padding: '8px 16px',
-            color: '#2ecc71', fontSize: 13, textDecoration: 'none', fontWeight: 500,
-          }}>
-            claudio.filho@ufpe.br
-          </a>
+
         </div>
 
         <div style={{ background: '#111c2b', border: '1px solid #7fdbff22', borderLeft: '3px solid #7fdbff55', borderRadius: 10, padding: '16px 20px' }}>
