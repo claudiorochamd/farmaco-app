@@ -3,9 +3,10 @@ import type { BodyVisualState, VitalSigns } from '../types';
 interface Props {
   bodyState: BodyVisualState;
   vitals: VitalSigns;
+  isDead?: boolean;
 }
 
-export default function Character({ bodyState, vitals }: Props) {
+export default function Character({ bodyState, vitals, isDead = false }: Props) {
   const beatDuration   = Math.round(60000 / vitals.heartRate);
   const breathDuration = Math.round(60000 / vitals.respiratoryRate);
 
@@ -267,37 +268,47 @@ export default function Character({ bodyState, vitals }: Props) {
         <path d="M 109,59 C 116,52 131,51 137,56" fill="none" stroke="#0a0a0a" strokeWidth="2.6" strokeLinecap="round"/>
         <path d="M 163,56 C 169,51 184,52 191,59" fill="none" stroke="#0a0a0a" strokeWidth="2.6" strokeLinecap="round"/>
 
-        {/* === OLHO ESQUERDO === */}
-        {/* Branco */}
-        <ellipse cx="122" cy="74" rx="14" ry="10" fill="white" stroke="rgba(0,0,0,0.18)" strokeWidth="0.8"/>
-        {/* Íris — marrom médio, contida pelo clip */}
-        <circle cx="122" cy="75" r={irisR} fill="#7a4a1a" clipPath="url(#cl)"/>
-        {/* Limbo (borda escura da íris) */}
-        <circle cx="122" cy="75" r={irisR} fill="none" stroke="rgba(0,0,0,0.45)" strokeWidth="1" clipPath="url(#cl)"/>
-        {/* Pupila */}
-        <circle cx="122" cy="75" r={pupilR} fill="#0a0a0a" clipPath="url(#cl)"/>
-        {/* Reflexo */}
-        <circle cx="125" cy="72" r="1.6" fill="rgba(255,255,255,0.92)" clipPath="url(#cl)"/>
-        <circle cx="127" cy="74" r="0.7" fill="rgba(255,255,255,0.5)" clipPath="url(#cl)"/>
-        {/* Pálpebra superior (tampa a parte de cima do olho) */}
-        <path d="M 108,74 C 112,63 132,63 136,74" fill={skinColor} clipPath="url(#cl)"/>
-        <path d="M 108,74 C 112,63 132,63 136,74" fill="none" stroke="rgba(0,0,0,0.32)" strokeWidth="1.2"/>
-        {/* Contorno do olho */}
-        <ellipse cx="122" cy="74" rx="14" ry="10" fill="none" stroke="rgba(0,0,0,0.22)" strokeWidth="1"/>
-        {/* Cílios inferiores (linha fina) */}
-        <path d="M 110,79 C 118,82 126,82 134,79" fill="none" stroke="rgba(0,0,0,0.15)" strokeWidth="0.8"/>
-
-        {/* === OLHO DIREITO === */}
-        <ellipse cx="178" cy="74" rx="14" ry="10" fill="white" stroke="rgba(0,0,0,0.18)" strokeWidth="0.8"/>
-        <circle cx="178" cy="75" r={irisR} fill="#7a4a1a" clipPath="url(#cr)"/>
-        <circle cx="178" cy="75" r={irisR} fill="none" stroke="rgba(0,0,0,0.45)" strokeWidth="1" clipPath="url(#cr)"/>
-        <circle cx="178" cy="75" r={pupilR} fill="#0a0a0a" clipPath="url(#cr)"/>
-        <circle cx="181" cy="72" r="1.6" fill="rgba(255,255,255,0.92)" clipPath="url(#cr)"/>
-        <circle cx="183" cy="74" r="0.7" fill="rgba(255,255,255,0.5)" clipPath="url(#cr)"/>
-        <path d="M 164,74 C 168,63 188,63 192,74" fill={skinColor} clipPath="url(#cr)"/>
-        <path d="M 164,74 C 168,63 188,63 192,74" fill="none" stroke="rgba(0,0,0,0.32)" strokeWidth="1.2"/>
-        <ellipse cx="178" cy="74" rx="14" ry="10" fill="none" stroke="rgba(0,0,0,0.22)" strokeWidth="1"/>
-        <path d="M 166,79 C 174,82 182,82 190,79" fill="none" stroke="rgba(0,0,0,0.15)" strokeWidth="0.8"/>
+        {isDead ? (
+          /* === OLHOS FECHADOS (óbito) === */
+          <>
+            {/* Olho esquerdo fechado */}
+            <ellipse cx="122" cy="74" rx="14" ry="10" fill={skinColor} stroke="rgba(0,0,0,0.15)" strokeWidth="0.8"/>
+            <path d="M 109,74 C 115,78 129,78 135,74" fill="none" stroke="rgba(0,0,0,0.55)" strokeWidth="2.5" strokeLinecap="round"/>
+            <path d="M 112,72 L 111,69 M 117,71 L 116,68 M 122,70 L 122,67 M 127,71 L 128,68 M 132,72 L 133,69"
+                  stroke="rgba(0,0,0,0.2)" strokeWidth="1" strokeLinecap="round"/>
+            {/* Olho direito fechado */}
+            <ellipse cx="178" cy="74" rx="14" ry="10" fill={skinColor} stroke="rgba(0,0,0,0.15)" strokeWidth="0.8"/>
+            <path d="M 165,74 C 171,78 185,78 191,74" fill="none" stroke="rgba(0,0,0,0.55)" strokeWidth="2.5" strokeLinecap="round"/>
+            <path d="M 168,72 L 167,69 M 173,71 L 172,68 M 178,70 L 178,67 M 183,71 L 184,68 M 188,72 L 189,69"
+                  stroke="rgba(0,0,0,0.2)" strokeWidth="1" strokeLinecap="round"/>
+          </>
+        ) : (
+          /* === OLHOS NORMAIS === */
+          <>
+            {/* Olho esquerdo */}
+            <ellipse cx="122" cy="74" rx="14" ry="10" fill="white" stroke="rgba(0,0,0,0.18)" strokeWidth="0.8"/>
+            <circle cx="122" cy="75" r={irisR} fill="#7a4a1a" clipPath="url(#cl)"/>
+            <circle cx="122" cy="75" r={irisR} fill="none" stroke="rgba(0,0,0,0.45)" strokeWidth="1" clipPath="url(#cl)"/>
+            <circle cx="122" cy="75" r={pupilR} fill="#0a0a0a" clipPath="url(#cl)"/>
+            <circle cx="125" cy="72" r="1.6" fill="rgba(255,255,255,0.92)" clipPath="url(#cl)"/>
+            <circle cx="127" cy="74" r="0.7" fill="rgba(255,255,255,0.5)" clipPath="url(#cl)"/>
+            <path d="M 108,74 C 112,63 132,63 136,74" fill={skinColor} clipPath="url(#cl)"/>
+            <path d="M 108,74 C 112,63 132,63 136,74" fill="none" stroke="rgba(0,0,0,0.32)" strokeWidth="1.2"/>
+            <ellipse cx="122" cy="74" rx="14" ry="10" fill="none" stroke="rgba(0,0,0,0.22)" strokeWidth="1"/>
+            <path d="M 110,79 C 118,82 126,82 134,79" fill="none" stroke="rgba(0,0,0,0.15)" strokeWidth="0.8"/>
+            {/* Olho direito */}
+            <ellipse cx="178" cy="74" rx="14" ry="10" fill="white" stroke="rgba(0,0,0,0.18)" strokeWidth="0.8"/>
+            <circle cx="178" cy="75" r={irisR} fill="#7a4a1a" clipPath="url(#cr)"/>
+            <circle cx="178" cy="75" r={irisR} fill="none" stroke="rgba(0,0,0,0.45)" strokeWidth="1" clipPath="url(#cr)"/>
+            <circle cx="178" cy="75" r={pupilR} fill="#0a0a0a" clipPath="url(#cr)"/>
+            <circle cx="181" cy="72" r="1.6" fill="rgba(255,255,255,0.92)" clipPath="url(#cr)"/>
+            <circle cx="183" cy="74" r="0.7" fill="rgba(255,255,255,0.5)" clipPath="url(#cr)"/>
+            <path d="M 164,74 C 168,63 188,63 192,74" fill={skinColor} clipPath="url(#cr)"/>
+            <path d="M 164,74 C 168,63 188,63 192,74" fill="none" stroke="rgba(0,0,0,0.32)" strokeWidth="1.2"/>
+            <ellipse cx="178" cy="74" rx="14" ry="10" fill="none" stroke="rgba(0,0,0,0.22)" strokeWidth="1"/>
+            <path d="M 166,79 C 174,82 182,82 190,79" fill="none" stroke="rgba(0,0,0,0.15)" strokeWidth="0.8"/>
+          </>
+        )}
         {/* Nose */}
         <path d="M 150,85 C 146,91 144,97 147,102 C 150,105 153,102 156,97 C 158,91 150,85 150,85" fill="none" stroke="rgba(0,0,0,0.11)" strokeWidth="1.4"/>
         <path d="M 146,101 C 143,103 143,106 146,107 M 154,107 C 157,106 157,103 154,101" fill="none" stroke="rgba(0,0,0,0.1)" strokeWidth="1.2" strokeLinecap="round"/>

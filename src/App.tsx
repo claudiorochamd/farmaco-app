@@ -20,9 +20,11 @@ let idCounter = 0;
 type MobilePanel = 'farmacos' | 'boneco' | 'vitais';
 
 export default function App() {
-  const [started, setStarted]         = useState(false);
-  const [mode, setMode]               = useState<'sim' | 'cenarios' | 'guia' | 'sobre'>('sim');
+  const [started, setStarted]               = useState(false);
+  const [mode, setMode]                     = useState<'sim' | 'cenarios' | 'guia' | 'sobre'>('sim');
   const [activeScenario, setActiveScenario] = useState<Scenario | null>(null);
+  const [scenarioPhase, setScenarioPhase]   = useState<'none' | 'active' | 'solved' | 'dead'>('none');
+  const [timeLeft, setTimeLeft]             = useState(60);
   const [mobilePanel, setMobilePanel] = useState<MobilePanel>('boneco');
   const [activeDrugs, setActiveDrugs] = useState<ActiveDrug[]>([]);
   const [isLight, setIsLight]         = useState(() => localStorage.getItem('theme') === 'light');
@@ -41,6 +43,31 @@ export default function App() {
   const drugIds      = useMemo(() => [...new Set(activeDrugs.map(d => d.drug.id))], [activeDrugs]);
   const interactions = useMemo(() => getActiveInteractions(drugIds),                [drugIds]);
 
+  // Timer do cenário
+  useEffect(() => {
+    if (scenarioPhase !== 'active') return;
+    if (timeLeft <= 0) { setScenarioPhase('dead'); return; }
+    const t = setTimeout(() => setTimeLeft(p => p - 1), 1000);
+    return () => clearTimeout(t);
+  }, [scenarioPhase, timeLeft]);
+
+  // Detecta fármaco correto
+  useEffect(() => {
+    if (scenarioPhase !== 'active' || !activeScenario) return;
+    const correctIds = new Set(activeScenario.drugs.map(d => d.drugId));
+    if (activeDrugs.some(ad => correctIds.has(ad.drug.id))) {
+      setScenarioPhase('solved');
+    }
+  }, [activeDrugs, scenarioPhase, activeScenario]);
+
+  // Vitals e bodyState exibidos (usa baseline quando fase ativa + sem fármacos)
+  const displayVitals = (scenarioPhase !== 'none' && activeDrugs.length === 0 && activeScenario)
+    ? activeScenario.baselineVitals
+    : vitals;
+  const displayBodyState = (scenarioPhase !== 'none' && activeDrugs.length === 0 && activeScenario)
+    ? activeScenario.baselineBodyState
+    : bodyState;
+
   if (!started) return <IntroScreen onStart={() => setStarted(true)} />;
 
   function handleAdminister(drug: Drug, dose: number) {
@@ -53,17 +80,27 @@ export default function App() {
   function handleClearAll() { setActiveDrugs([]); }
 
   function handleSimulateScenario(scenario: Scenario) {
-    const drugs = scenario.drugs
-      .map(({ drugId, dosePercent }) => {
-        const d = allDrugs.find(drug => drug.id === drugId);
-        if (!d) return null;
-        return { instanceId: `${drugId}-scenario`, drug: d, dose: d.maxDose * dosePercent };
-      })
-      .filter(Boolean) as ActiveDrug[];
-    setActiveDrugs(drugs);
+    setActiveDrugs([]);            // começa sem fármaco — sintomas são do baseline
     setActiveScenario(scenario);
+    setScenarioPhase('active');
+    setTimeLeft(60);
     setMode('sim');
     setMobilePanel('boneco');
+  }
+
+  function handleRestartScenario() {
+    if (!activeScenario) return;
+    setActiveDrugs([]);
+    setScenarioPhase('active');
+    setTimeLeft(60);
+  }
+
+  function handleExitScenario() {
+    setActiveDrugs([]);
+    setActiveScenario(null);
+    setScenarioPhase('none');
+    setTimeLeft(60);
+    setMode('cenarios');
   }
 
   function handleSimulateDrug(id: string) {
@@ -87,6 +124,8 @@ export default function App() {
   }
 
   // ── Reutilizável: centro com boneco ───────────────────────────────────────
+  const isDead = scenarioPhase === 'dead';
+
   const CharacterCenter = (
     <div style={{
       display: 'flex', flexDirection: 'column', alignItems: 'center',
@@ -112,7 +151,7 @@ export default function App() {
       </div>
 
       <div style={{ width: '100%', maxWidth: 260, flexShrink: 0 }}>
-        <Character bodyState={bodyState} vitals={vitals} />
+        <Character bodyState={displayBodyState} vitals={displayVitals} isDead={isDead} />
       </div>
 
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5, justifyContent: 'center', maxWidth: 340, fontSize: 10 }}>
@@ -246,32 +285,106 @@ export default function App() {
       {mode === 'guia'     && <LearningGuide onSimulateInteraction={handleSimulateInteraction} onSimulateDrug={handleSimulateDrug} />}
       {mode === 'sobre'    && <SobreSection />}
 
-      {/* ── BANNER DE CENÁRIO ATIVO ────────────────────────── */}
-      {mode === 'sim' && activeScenario && (
+      {/* ── BANNER DE CENÁRIO ──────────────────────────────── */}
+      {mode === 'sim' && activeScenario && scenarioPhase !== 'dead' && (
         <div style={{
-          background: `${activeScenario.color}18`,
-          borderBottom: `1px solid ${activeScenario.color}44`,
+          background: scenarioPhase === 'solved' ? 'rgba(46,204,113,0.12)' : `${activeScenario.color}18`,
+          borderBottom: `1px solid ${scenarioPhase === 'solved' ? '#2ecc71' : activeScenario.color}44`,
           padding: '8px 20px',
           display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0, flexWrap: 'wrap',
         }}>
-          <span style={{ fontSize: 11, color: activeScenario.color, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-            Cenário Ativo
-          </span>
-          <span style={{ fontSize: 13, color: '#e6edf3', fontWeight: 600 }}>{activeScenario.title}</span>
-          <span style={{ fontSize: 12, color: '#8b949e' }}>
-            — {activeScenario.drugNames.join(' + ')} administrado(s)
-          </span>
+          {scenarioPhase === 'solved' ? (
+            <>
+              <span style={{ fontSize: 13, color: '#2ecc71', fontWeight: 700 }}>Tratamento correto!</span>
+              <span style={{ fontSize: 12, color: '#8b949e' }}>Paciente estabilizado — {activeScenario.title}</span>
+            </>
+          ) : (
+            <>
+              <span style={{ fontSize: 11, color: activeScenario.color, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                Cenário Ativo
+              </span>
+              <span style={{ fontSize: 13, color: '#e6edf3', fontWeight: 600 }}>{activeScenario.title}</span>
+              <span style={{ fontSize: 12, color: '#8b949e' }}>— Administre o fármaco correto</span>
+              {/* Countdown */}
+              <span style={{
+                marginLeft: 8, fontFamily: 'monospace', fontWeight: 800, fontSize: 15,
+                color: timeLeft <= 15 ? '#e74c3c' : timeLeft <= 30 ? '#f39c12' : '#e6edf3',
+                animation: timeLeft <= 10 ? 'pulse 0.6s ease-in-out infinite' : 'none',
+              }}>
+                0:{String(timeLeft).padStart(2, '0')}
+              </span>
+            </>
+          )}
           <button
-            onClick={() => { setActiveScenario(null); setActiveDrugs([]); }}
-            style={{ marginLeft: 'auto', background: 'none', border: `1px solid ${activeScenario.color}55`, borderRadius: 5, padding: '3px 10px', color: activeScenario.color, fontSize: 11, cursor: 'pointer' }}
+            onClick={handleExitScenario}
+            style={{ marginLeft: 'auto', background: 'none', border: `1px solid #30363d`, borderRadius: 5, padding: '3px 10px', color: '#6b7280', fontSize: 11, cursor: 'pointer' }}
           >
-            Encerrar cenário
+            Encerrar
           </button>
         </div>
       )}
 
       {/* ── SIMULAÇÃO ──────────────────────────────────────── */}
       {mode === 'sim' && (
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', minHeight: 0, position: 'relative' }}>
+
+        {/* Tela de óbito */}
+        {isDead && activeScenario && (
+          <div style={{
+            position: 'absolute', inset: 0, zIndex: 50,
+            background: 'rgba(0,0,0,0.90)',
+            backdropFilter: 'blur(6px)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            padding: 24,
+          }}>
+            <div style={{ textAlign: 'center', maxWidth: 400 }}>
+              {/* Ícone de flatline ECG */}
+              <svg width="200" height="40" viewBox="0 0 200 40" style={{ display: 'block', margin: '0 auto 20px' }}>
+                <polyline points="0,20 60,20 65,20 70,20 75,20 80,5 85,35 90,20 130,20 200,20"
+                  fill="none" stroke="#e74c3c" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" opacity="0.4"/>
+                <line x1="0" y1="20" x2="200" y2="20" stroke="#e74c3c" strokeWidth="2" opacity="0.7"
+                  strokeDasharray="4 4"/>
+              </svg>
+
+              <div style={{ fontSize: 26, fontWeight: 800, color: '#e6edf3', marginBottom: 10, letterSpacing: '-0.01em' }}>
+                Claudinho veio à óbito.
+              </div>
+              <div style={{ fontSize: 13, color: '#8b949e', lineHeight: 1.7, marginBottom: 8 }}>
+                O paciente não resistiu. O tempo esgotou antes do tratamento.
+              </div>
+              <div style={{ fontSize: 13, color: '#6b7280', marginBottom: 28 }}>
+                O fármaco correto era:{' '}
+                <strong style={{ color: activeScenario.color }}>
+                  {activeScenario.drugNames.join(' + ')}
+                </strong>
+              </div>
+              <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
+                <button
+                  onClick={handleRestartScenario}
+                  style={{
+                    background: '#2ecc71', border: 'none', borderRadius: 8,
+                    padding: '10px 24px', color: '#fff', fontSize: 13,
+                    fontWeight: 700, cursor: 'pointer',
+                  }}
+                >
+                  Tentar novamente
+                </button>
+                <button
+                  onClick={handleExitScenario}
+                  style={{
+                    background: 'none', border: '1px solid #30363d', borderRadius: 8,
+                    padding: '10px 24px', color: '#8b949e', fontSize: 13,
+                    fontWeight: 600, cursor: 'pointer',
+                  }}
+                >
+                  Voltar aos cenários
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Conteúdo da simulação */}
         <>
           {/* MOBILE: painel único com abas */}
           {isMobile && (
@@ -305,7 +418,7 @@ export default function App() {
                 {mobilePanel === 'boneco' && CharacterCenter}
                 {mobilePanel === 'vitais' && (
                   <div style={{ padding: '14px 12px' }}>
-                    <VitalSignsPanel vitals={vitals} />
+                    <VitalSignsPanel vitals={displayVitals} />
                   </div>
                 )}
               </div>
@@ -334,7 +447,7 @@ export default function App() {
                     {CharacterCenter}
                   </div>
                   <div style={{ borderTop: '1px solid #21262d', padding: '14px', overflowY: 'auto', maxHeight: 320, background: '#0d1117' }}>
-                    <VitalSignsPanel vitals={vitals} />
+                    <VitalSignsPanel vitals={displayVitals} />
                   </div>
                 </div>
               </main>
@@ -356,7 +469,7 @@ export default function App() {
                   {CharacterCenter}
                 </section>
                 <aside style={{ background: 'var(--bg)', borderLeft: '1px solid var(--border)', padding: '16px 14px', overflowY: 'auto' }}>
-                  <VitalSignsPanel vitals={vitals} />
+                  <VitalSignsPanel vitals={displayVitals} />
                 </aside>
               </main>
               <footer style={{ background: 'var(--bg-2)', borderTop: '1px solid var(--border)', padding: '14px 24px', flexShrink: 0, maxHeight: interactions.length > 0 ? 340 : 150, overflowY: 'auto' }}>
@@ -366,6 +479,7 @@ export default function App() {
             </>
           )}
         </>
+        </div>
       )}
 
       <style>{`

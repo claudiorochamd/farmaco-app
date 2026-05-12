@@ -1,8 +1,10 @@
+import type { VitalSigns, BodyVisualState } from '../types';
+
 export type Severity = 'critical' | 'urgent' | 'moderate';
 
 export interface ScenarioDrug {
   drugId: string;
-  dosePercent: number; // 0 a 1
+  dosePercent: number;
 }
 
 export interface Scenario {
@@ -15,6 +17,8 @@ export interface Scenario {
   color: string;
   severity: Severity;
   expectedEffects: string[];
+  baselineVitals: VitalSigns;
+  baselineBodyState: BodyVisualState;
 }
 
 export const scenarios: Scenario[] = [
@@ -37,6 +41,16 @@ export const scenarios: Scenario[] = [
       'Midríase',
       'Tremor',
     ],
+    baselineVitals: {
+      heartRate: 130, systolicBP: 72, diastolicBP: 38,
+      respiratoryRate: 28, spO2: 84, temperature: 37.2,
+    },
+    baselineBodyState: {
+      heartRateMultiplier: 1.86, skinVasodilation: 0.65,
+      pupilNormalized: 0.5, bronchialNormalized: 0.42,
+      sweating: 0.4, salivation: 0.1, lacrimation: 0.1,
+      tremor: 0.2, giMotility: 1.0,
+    },
   },
   {
     id: 'bradicardia',
@@ -56,6 +70,16 @@ export const scenarios: Scenario[] = [
       'Anhidrose (temperatura ↑)',
       'Broncodilatação leve',
     ],
+    baselineVitals: {
+      heartRate: 32, systolicBP: 80, diastolicBP: 52,
+      respiratoryRate: 14, spO2: 93, temperature: 36.5,
+    },
+    baselineBodyState: {
+      heartRateMultiplier: 0.46, skinVasodilation: -0.2,
+      pupilNormalized: 0.5, bronchialNormalized: 1.0,
+      sweating: 0.1, salivation: 0, lacrimation: 0,
+      tremor: 0, giMotility: 1.0,
+    },
   },
   {
     id: 'hipertensao',
@@ -74,6 +98,16 @@ export const scenarios: Scenario[] = [
       'Vasodilatação periférica',
       'Leve broncoconstrição (evitar em asmáticos)',
     ],
+    baselineVitals: {
+      heartRate: 98, systolicBP: 210, diastolicBP: 130,
+      respiratoryRate: 18, spO2: 97, temperature: 37.0,
+    },
+    baselineBodyState: {
+      heartRateMultiplier: 1.4, skinVasodilation: -0.35,
+      pupilNormalized: 0.55, bronchialNormalized: 1.0,
+      sweating: 0.2, salivation: 0, lacrimation: 0,
+      tremor: 0.1, giMotility: 1.0,
+    },
   },
   {
     id: 'asma',
@@ -81,7 +115,7 @@ export const scenarios: Scenario[] = [
     severity: 'urgent',
     color: '#27ae60',
     situation:
-      'Paciente com dispneia grave, sibilos difusos e uso de musculatura acessória. SpO2 de 88%. Crise de broncoespasmo agudo com resposta inflamatória.',
+      'Paciente com dispneia grave, sibilos difusos e uso de musculatura acessória. SpO2 de 82%. Crise de broncoespasmo agudo com resposta inflamatória.',
     drugNames: ['Salbutamol'],
     drugs: [{ drugId: 'salbutamol', dosePercent: 0.85 }],
     rationale:
@@ -91,8 +125,17 @@ export const scenarios: Scenario[] = [
       '↑ SpO2',
       '↑ leve da frequência cardíaca',
       'Tremor nas extremidades',
-      'Leve hipocalemia',
     ],
+    baselineVitals: {
+      heartRate: 115, systolicBP: 128, diastolicBP: 82,
+      respiratoryRate: 30, spO2: 82, temperature: 37.3,
+    },
+    baselineBodyState: {
+      heartRateMultiplier: 1.64, skinVasodilation: 0,
+      pupilNormalized: 0.5, bronchialNormalized: 0.28,
+      sweating: 0.5, salivation: 0, lacrimation: 0.1,
+      tremor: 0.2, giMotility: 1.0,
+    },
   },
   {
     id: 'sepse',
@@ -100,7 +143,7 @@ export const scenarios: Scenario[] = [
     severity: 'critical',
     color: '#9b59b6',
     situation:
-      'Paciente séptico com vasodilatação sistêmica refratária, PA 70/40 mmHg, extremidades frias e mottling cutâneo. Não responde à reposição volêmica.',
+      'Paciente séptico com vasodilatação sistêmica refratária, PA 68/38 mmHg, extremidades frias e mottling cutâneo. Não responde à reposição volêmica.',
     drugNames: ['Norepinefrina'],
     drugs: [{ drugId: 'norepinefrina', dosePercent: 0.90 }],
     rationale:
@@ -111,6 +154,16 @@ export const scenarios: Scenario[] = [
       'Bradicardia reflexa',
       'Pele pálida/fria',
     ],
+    baselineVitals: {
+      heartRate: 128, systolicBP: 68, diastolicBP: 38,
+      respiratoryRate: 24, spO2: 91, temperature: 39.2,
+    },
+    baselineBodyState: {
+      heartRateMultiplier: 1.83, skinVasodilation: 0.55,
+      pupilNormalized: 0.5, bronchialNormalized: 0.85,
+      sweating: 0.65, salivation: 0, lacrimation: 0,
+      tremor: 0.1, giMotility: 0.7,
+    },
   },
   {
     id: 'organofosforado',
@@ -129,7 +182,17 @@ export const scenarios: Scenario[] = [
       'Miose intensa',
       'Sudorese profusa',
       'Sialorreia e lacrimejamento',
-      '↓ SpO2 (broncoespasmo)',
+      '↓ SpO2',
     ],
+    baselineVitals: {
+      heartRate: 35, systolicBP: 78, diastolicBP: 52,
+      respiratoryRate: 28, spO2: 79, temperature: 35.8,
+    },
+    baselineBodyState: {
+      heartRateMultiplier: 0.5, skinVasodilation: 0.4,
+      pupilNormalized: 0.05, bronchialNormalized: 0.30,
+      sweating: 1.0, salivation: 1.0, lacrimation: 0.9,
+      tremor: 0.3, giMotility: 2.5,
+    },
   },
 ];
