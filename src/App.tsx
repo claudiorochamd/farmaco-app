@@ -41,6 +41,14 @@ export default function App() {
   }
   function handleClearAll() { setActiveDrugs([]); }
 
+  function handleSimulateDrug(id: string) {
+    const d = allDrugs.find(drug => drug.id === id);
+    if (!d) return;
+    setActiveDrugs([{ instanceId: `${id}-sim`, drug: d, dose: d.maxDose * 0.6 }]);
+    setMode('sim');
+    setMobilePanel('boneco');
+  }
+
   function handleSimulateInteraction(id1: string, id2: string) {
     const d1 = allDrugs.find(d => d.id === id1);
     const d2 = allDrugs.find(d => d.id === id2);
@@ -191,7 +199,7 @@ export default function App() {
       </div>
 
       {/* ── GUIA ───────────────────────────────────────────── */}
-      {mode === 'guia' && <LearningGuide onSimulateInteraction={handleSimulateInteraction} />}
+      {mode === 'guia' && <LearningGuide onSimulateInteraction={handleSimulateInteraction} onSimulateDrug={handleSimulateDrug} />}
 
       {/* ── SIMULAÇÃO ──────────────────────────────────────── */}
       {mode === 'sim' && (

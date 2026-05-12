@@ -11,6 +11,7 @@ const TOPICS = [
   { id: 'agon_c', label: 'Agonistas Colinérgicos',      color: '#27ae60' },
   { id: 'bloq_c', label: 'Bloqueadores Colinérgicos',   color: '#8e44ad' },
   { id: 'inter',  label: 'Interações Medicamentosas',   color: '#f39c12' },
+  { id: 'sobre',  label: 'Sobre este Projeto',          color: '#c9d1d9' },
 ];
 
 import { drugs } from '../data/drugs';
@@ -18,9 +19,10 @@ import { interactions } from '../data/interactions';
 
 interface Props {
   onSimulateInteraction: (id1: string, id2: string) => void;
+  onSimulateDrug: (id: string) => void;
 }
 
-export default function LearningGuide({ onSimulateInteraction }: Props) {
+export default function LearningGuide({ onSimulateInteraction, onSimulateDrug }: Props) {
   const [active, setActive] = useState('sna');
   const width    = useWindowWidth();
   const isMobile = width < 700;
@@ -73,11 +75,12 @@ export default function LearningGuide({ onSimulateInteraction }: Props) {
           {active === 'trans'  && <TransSection />}
           {active === 'rec_a'  && <RecAdren />}
           {active === 'rec_c'  && <RecColin />}
-          {active === 'agon_a' && <AgonAdren />}
-          {active === 'bloq_a' && <BloqAdren />}
-          {active === 'agon_c' && <AgonColin />}
-          {active === 'bloq_c' && <BloqColin />}
+          {active === 'agon_a' && <AgonAdren onSimulate={onSimulateDrug} />}
+          {active === 'bloq_a' && <BloqAdren onSimulate={onSimulateDrug} />}
+          {active === 'agon_c' && <AgonColin onSimulate={onSimulateDrug} />}
+          {active === 'bloq_c' && <BloqColin onSimulate={onSimulateDrug} />}
           {active === 'inter'  && <InterSection onSimulate={onSimulateInteraction} />}
+          {active === 'sobre'  && <SobreSection />}
         </div>
       </div>
     </div>
@@ -407,40 +410,40 @@ function RecColin() {
 }
 
 // ─── AGONISTAS ADRENÉRGICOS ───────────────────────────────────────────────────
-function AgonAdren() {
+function AgonAdren({ onSimulate }: { onSimulate: (id: string) => void }) {
   const items = [
-    { name: 'Epinefrina (Adrenalina)', rec: 'α1, α2, β1, β2', sub: 'Catecolamina endógena não seletiva',
+    { drugId: 'epinefrina', name: 'Epinefrina (Adrenalina)', rec: 'α1, α2, β1, β2', sub: 'Catecolamina endógena não seletiva',
       mec: 'Agonista direto de todos os receptores adrenérgicos.',
       uso: 'PCR, choque anafilático (antagonista fisiológico da histamina), prolongação de anestesia local (vasoconstrição).',
       ec: 'Hipertensão arterial, taquicardia, necrose de extremidades (não usar em nariz, dedos — vasoconstrição isquêmica).', color: '#e67e22' },
-    { name: 'Norepinefrina (Noradrenalina)', rec: 'α1, α2, β1', sub: 'Catecolamina endógena α/β1',
+    { drugId: 'norepinefrina', name: 'Norepinefrina (Noradrenalina)', rec: 'α1, α2, β1', sub: 'Catecolamina endógena α/β1',
       mec: 'Agonista α1, α2 e β1; sem ação β2 significativa.',
       uso: 'Choque séptico (↑ PA, ↓ vasodilatação) e cardiogênico (menor risco de arritmias). Contraindicada no choque anafilático (sem β2).',
       ec: 'Hipertensão sistólica e diastólica, necrose de pele e mucosas, bradicardia reflexa (compensada pelo β1).', color: '#e67e22' },
-    { name: 'Dopamina', rec: 'D1–D5, β1, α1', sub: 'Catecolamina dose-dependente',
+    { drugId: 'dopamina', name: 'Dopamina', rec: 'D1–D5, β1, α1', sub: 'Catecolamina dose-dependente',
       mec: 'D1/D2 em baixas doses (vasodilatação renal); β1 em doses médias; α1 em altas doses (vasoconstrição).',
       uso: 'Choque, insuficiência cardíaca, hipotensão refratária.',
       ec: 'Náusea, vômitos, taquicardia, angina, hipertensão.', color: '#e67e22' },
-    { name: 'Dobutamina', rec: 'β1 (seletivo)', sub: 'Agonista β1 sintético',
+    { drugId: 'dobutamina', name: 'Dobutamina', rec: 'β1 (seletivo)', sub: 'Agonista β1 sintético',
       mec: 'Agonista seletivo β1; inotrópico positivo com menor cronotropismo.',
-      uso: 'Choque cardiogênico, ICC (última escolha para ↑ débito cardíaco).',
+      uso: 'Choque cardiogênico, insuficiência cardíaca congestiva (última escolha para ↑ débito cardíaco).',
       ec: 'Agitação, taquicardia, tremores, hiperglicemia, hipopotassemia.', color: '#e67e22' },
-    { name: 'Isoproterenol (Isoprelanila)', rec: 'β1, β2', sub: 'Agonista β não seletivo',
+    { drugId: 'isoproterenol', name: 'Isoproterenol (Isoprelanila)', rec: 'β1, β2', sub: 'Agonista β não seletivo',
       mec: 'Agonista β1 + β2, sem ação α.',
-      uso: 'Bradicardia, bloqueio de ramo, arritmias. Contraindicado: asma (apesar de broncodilatação, causa isquemia cardíaca) e IC aguda.',
+      uso: 'Bradicardia, bloqueio de ramo, arritmias. Contraindicado na asma (apesar de broncodilatação, causa isquemia cardíaca) e na IC aguda.',
       ec: 'Taquicardia, agitação, nervosismo, hiperglicemia, hipopotassemia, hipotensão periférica.', color: '#e67e22' },
-    { name: 'Salbutamol (Albuterol / Aerolin)', rec: 'β2 (seletivo)', sub: 'Agonista β2 — curta ação (4–6h)',
+    { drugId: 'salbutamol', name: 'Salbutamol (Albuterol / Aerolin)', rec: 'β2 (seletivo)', sub: 'Agonista β2 — curta ação (4–6h)',
       mec: 'Agonista β2 seletivo; início de ação: 5–8 min.',
       uso: 'Broncoespasmo, asma (broncodilatação), tocolítico (parto prematuro).',
       ec: 'Taquicardia (receptores β2 no coração), tremor, hipocalemia (influxo K⁺ muscular), hiperglicemia.', color: '#e67e22' },
     { name: 'Salmeterol', rec: 'β2 (seletivo)', sub: 'Agonista β2 — longa ação (>12h)',
       mec: 'Broncodilatador de longa duração.',
       uso: 'Manutenção da asma e DPOC.', ec: 'Semelhante ao salbutamol, porém menos pronunciados.', color: '#e67e22' },
-    { name: 'Fenilefrina', rec: 'α1 (seletivo)', sub: 'Agonista α1 sintético',
+    { drugId: 'fenilefrina', name: 'Fenilefrina', rec: 'α1 (seletivo)', sub: 'Agonista α1 sintético',
       mec: 'Vasoconstritor; midriático que não causa cicloplegia.',
       uso: 'Descongestionante nasal, taquicardia supraventricular, midríase, priapismo (vasoconstrição).',
       ec: 'Bradicardia reflexa, hipertensão, anosmia (uso nasal prolongado).', color: '#e67e22' },
-    { name: 'Clonidina', rec: 'α2 (central)', sub: 'Agonista α2 — anti-hipertensivo central',
+    { drugId: 'clonidina', name: 'Clonidina', rec: 'α2 (central)', sub: 'Agonista α2 — anti-hipertensivo central',
       mec: 'Estimula α2 central → ↓ tônus simpático → ↓ PA.',
       uso: 'Hipertensão arterial, pré-anestésico, analgésico.',
       ec: 'Sedação, boca seca, hipotensão ortostática, tontura, disfunção sexual.', color: '#e67e22' },
@@ -453,11 +456,11 @@ function AgonAdren() {
       uso: 'Bexiga hiperativa, incontinência urinária.',
       ec: 'Hipertensão, taquicardia.', color: '#e67e22' },
   ];
-  return <DrugList items={items} />;
+  return <DrugList items={items} onSimulate={onSimulate} />;
 }
 
 // ─── BLOQUEADORES ADRENÉRGICOS ────────────────────────────────────────────────
-function BloqAdren() {
+function BloqAdren({ onSimulate }: { onSimulate: (id: string) => void }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
 
@@ -469,25 +472,40 @@ function BloqAdren() {
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
         {[
-          { name: 'Fenoxibenzamina', rec: 'α1 + α2', type: 'Não seletivo — IRREVERSÍVEL',
-            uso: 'Feocromocitoma (↓ PA por inibição da vasoconstrição). Efeitos colaterais:taquicardia reflexa, hipotensão postural, congestão nasal.' },
-          { name: 'Fentolamina', rec: 'α1 + α2', type: 'Não seletivo — REVERSÍVEL',
-            uso: 'Feocromocitoma, disfunção erétil. Efeitos colaterais:compartilha com fenoxibenzamina.' },
-          { name: 'Prazosina', rec: 'α1 (todos subtipos)', type: 'α1 seletivo',
-            uso: 'HAS, Hiperplasia Prostática Benigna (HPB). Efeitos colaterais:síncope na 1ª dose, taquicardia reflexa, hipotensão ortostática.' },
-          { name: 'Terazosina', rec: 'α1', type: 'α1 seletivo',
-            uso: 'HPB + HAS. Não urosseletiva. Efeitos colaterais:semelhante à prazosina.' },
-          { name: 'Doxazosina', rec: 'α1', type: 'α1 seletivo (análogo da prazosina)',
-            uso: 'HPB + HAS. Efeitos colaterais:semelhante à prazosina.' },
-          { name: 'Tansulosina', rec: 'α1A (próstata)', type: 'α1A seletivo — UROSSELETIVO',
-            uso: 'HPB. Menos efeitos cardiovasculares.' },
-          { name: 'Silodosina', rec: 'α1A (próstata)', type: 'α1A seletivo — UROSSELETIVO',
-            uso: 'HPB. Menos efeitos cardiovasculares que a tansulosina.' },
-        ].map(({ name, rec, type, uso }) => (
+          { drugId: undefined, name: 'Fenoxibenzamina', rec: 'α1 + α2', type: 'Não seletivo — IRREVERSÍVEL',
+            uso: 'Feocromocitoma (↓ PA por inibição da vasoconstrição).',
+            ec: 'Taquicardia reflexa, hipotensão postural, congestão nasal.' },
+          { drugId: 'fentolamina', name: 'Fentolamina', rec: 'α1 + α2', type: 'Não seletivo — REVERSÍVEL',
+            uso: 'Feocromocitoma, disfunção erétil.',
+            ec: 'Compartilha com fenoxibenzamina.' },
+          { drugId: 'prazosina', name: 'Prazosina', rec: 'α1 (todos subtipos)', type: 'α1 seletivo',
+            uso: 'HAS, Hiperplasia Prostática Benigna (HPB).',
+            ec: 'Síncope na 1ª dose, taquicardia reflexa, hipotensão ortostática.' },
+          { drugId: undefined, name: 'Terazosina', rec: 'α1', type: 'α1 seletivo',
+            uso: 'HPB + HAS. Não urosseletiva.',
+            ec: 'Semelhante à prazosina.' },
+          { drugId: undefined, name: 'Doxazosina', rec: 'α1', type: 'α1 seletivo (análogo da prazosina)',
+            uso: 'HPB + HAS.',
+            ec: 'Semelhante à prazosina.' },
+          { drugId: undefined, name: 'Tansulosina', rec: 'α1A (próstata)', type: 'α1A seletivo — urosseletivo',
+            uso: 'HPB. Menos efeitos cardiovasculares.', ec: '—' },
+          { drugId: undefined, name: 'Silodosina', rec: 'α1A (próstata)', type: 'α1A seletivo — urosseletivo',
+            uso: 'HPB. Menos efeitos cardiovasculares que a tansulosina.', ec: '—' },
+        ].map(({ drugId, name, rec, type, uso, ec }) => (
           <div key={name} style={{ background: '#111c2b', border: '1px solid #95a5a644', borderRadius: 8, padding: '12px 14px' }}>
             <div style={{ color: '#95a5a6', fontWeight: 700, fontSize: 13 }}>{name}</div>
             <div style={{ color: '#6b7280', fontSize: 11, margin: '2px 0 6px' }}>{type} · {rec}</div>
-            <p style={{ margin: 0, fontSize: 12, color: '#8b949e', lineHeight: 1.6 }}>{uso}</p>
+            <p style={{ margin: '0 0 2px', fontSize: 12, color: '#8b949e', lineHeight: 1.5 }}>
+              <strong style={{ color: '#2ecc71' }}>Uso:</strong> {uso}
+            </p>
+            <p style={{ margin: ec === '—' ? 0 : '0 0 8px', fontSize: 12, color: '#8b949e', lineHeight: 1.5 }}>
+              <strong style={{ color: '#e74c3c' }}>Efeitos colaterais:</strong> {ec}
+            </p>
+            {drugId && (
+              <button onClick={() => onSimulate(drugId)} style={{ marginTop: 6, background: '#95a5a618', border: '1px solid #95a5a644', borderRadius: 5, padding: '4px 10px', color: '#95a5a6', fontSize: 11, fontWeight: 600, cursor: 'pointer' }}>
+                Ver no boneco
+              </button>
+            )}
           </div>
         ))}
       </div>
@@ -509,17 +527,17 @@ function BloqAdren() {
         {
           gen: '1ª Geração — β não seletivos (β1 + β2)', color: '#95a5a6',
           drugs: [
-            { name: 'Propranolol', detail: 'Protótipo. Lipofílico, atravessa BHE → trata enxaqueca, tremores, ansiedade. Efeito estabilizador de membrana. Sem ASI.' },
+            { drugId: 'propranolol', name: 'Propranolol', detail: 'Protótipo. Lipofílico, atravessa BHE → trata enxaqueca, tremores, ansiedade. Efeito estabilizador de membrana. Sem ASI.' },
             { name: 'Pindolol', detail: 'Possui ASI em β2. Mantém estímulo basal → menos bradicardia e débito cardíaco não reduzido em repouso.' },
-            { name: 'Nadolol', detail: 'Anti-hipertensivo, baixa lipossolubilidade, excreção renal. HAS + angina pectoris. Profilaxia hemorragia varicosa esofágica (com propranolol).' },
+            { name: 'Nadolol', detail: 'Anti-hipertensivo, baixa lipossolubilidade, excreção renal. HAS + angina pectoris. Profilaxia da hemorragia varicosa esofágica (com propranolol).' },
             { name: 'Timolol', detail: 'Hipotensor ocular (glaucoma de ângulo aberto). Também usado na HAS e ICC.' },
           ],
         },
         {
           gen: '2ª Geração — β1 seletivos / Cardioseletivos', color: '#3498db',
           drugs: [
-            { name: 'Atenolol', detail: 'Protótipo dos cardioseletivos. Sem ASI. HAS, doença coronariana, arritmias, angina, pós-infarto.' },
-            { name: 'Metoprolol', detail: 'Sem ASI. HAS, taquicardia, ICC crônica, angina, pós-infarto.' },
+            { drugId: 'atenolol', name: 'Atenolol', detail: 'Protótipo dos cardioseletivos. Sem ASI. HAS, doença coronariana, arritmias, angina, pós-infarto.' },
+            { drugId: 'metoprolol', name: 'Metoprolol', detail: 'Sem ASI. HAS, taquicardia, ICC crônica, angina, pós-infarto.' },
             { name: 'Esmolol', detail: 'Início rápido, curta duração. Emergências: controle de arritmias e HAS pós-operatória grave.' },
             { name: 'Acebutolol', detail: 'Possui ASI. HAS, arritmias, infarto agudo do miocárdio.' },
             { name: 'Bisoprolol', detail: 'Altamente seletivo β1. HAS + ICC moderada a grave. Metabolismo renal e hepático.' },
@@ -528,28 +546,35 @@ function BloqAdren() {
         {
           gen: '3ª Geração β não seletivos — com ações adicionais', color: '#e67e22',
           drugs: [
-            { name: 'Labetalol', detail: 'Bloqueia α1 + β1 + β2 (ASI β2). Vasodilatação + ↓ broncoconstrição. HAS leve a moderada, HAS do parto, emergências hipertensivas. Não usar em asmáticos.' },
-            { name: 'Carvedilol', detail: 'Bloqueia α1 + β (sem ASI). Antioxidante. ICC crônica (↓ mortalidade). Efeitos colaterais:broncoconstrição, bradicardia, hipoglicemia.' },
+            { drugId: 'labetalol', name: 'Labetalol', detail: 'Bloqueia α1 + β1 + β2 (ASI β2). Vasodilatação + ↓ broncoconstrição. HAS leve a moderada, HAS do parto, emergências hipertensivas. Não usar em asmáticos.' },
+            { name: 'Carvedilol', detail: 'Bloqueia α1 + β (sem ASI). Antioxidante. ICC crônica (↓ mortalidade). Efeitos colaterais: broncoconstrição, bradicardia, hipoglicemia.' },
             { name: 'Bucindolol', detail: 'Fraca ação α1 + ASI em β1. Menor bradicardia. ICC.' },
-            { name: 'Carteolol', detail: 'ASI em β2. Hipotensor ocular, produz NO.' },
+            { name: 'Carteolol', detail: 'ASI em β2. Hipotensor ocular, produz óxido nítrico.' },
           ],
         },
         {
           gen: '3ª Geração β1 seletivos — com ações adicionais', color: '#2ecc71',
           drugs: [
             { name: 'Betaxolol', detail: 'Sem ASI, bloqueia Ca²⁺. Glaucoma de ângulo aberto, HAS, angina. Mais seguro em asmáticos (cardioseletivo).' },
-            { name: 'Celiprolol', detail: 'ASI em β2 → broncodilatação. Vasodilatação via NO. Antiarrítmico, HAS, angina.' },
-            { name: 'Nebivolol', detail: 'Vasodilatação via NO. Antioxidante. HAS, proteção cardíaca pós-falência ventricular.' },
+            { name: 'Celiprolol', detail: 'ASI em β2 → broncodilatação. Vasodilatação via óxido nítrico. Antiarrítmico, HAS, angina.' },
+            { name: 'Nebivolol', detail: 'Vasodilatação via óxido nítrico. Antioxidante. HAS, proteção cardíaca pós-falência ventricular.' },
           ],
         },
       ].map(({ gen, color, drugs }) => (
         <div key={gen} style={{ background: '#111c2b', border: `1px solid ${color}33`, borderRadius: 10, padding: '14px 18px' }}>
           <div style={{ color, fontWeight: 700, fontSize: 13, marginBottom: 12 }}>{gen}</div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            {drugs.map(({ name, detail }) => (
-              <div key={name} style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
-                <span style={{ color, fontWeight: 700, fontSize: 12, minWidth: 110, flexShrink: 0 }}>{name}</span>
-                <span style={{ fontSize: 12, color: '#8b949e', lineHeight: 1.6 }}>{detail}</span>
+            {drugs.map(({ name, detail, drugId }: { name: string; detail: string; drugId?: string }) => (
+              <div key={name} style={{ display: 'flex', gap: 10, alignItems: 'flex-start', flexWrap: 'wrap' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 120, flexShrink: 0 }}>
+                  <span style={{ color, fontWeight: 700, fontSize: 12 }}>{name}</span>
+                  {drugId && (
+                    <button onClick={() => onSimulate(drugId)} style={{ background: `${color}18`, border: `1px solid ${color}44`, borderRadius: 4, padding: '2px 6px', color, fontSize: 10, fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap' }}>
+                      Ver no boneco
+                    </button>
+                  )}
+                </div>
+                <span style={{ fontSize: 12, color: '#8b949e', lineHeight: 1.6, flex: 1 }}>{detail}</span>
               </div>
             ))}
           </div>
@@ -560,31 +585,31 @@ function BloqAdren() {
 }
 
 // ─── AGONISTAS COLINÉRGICOS ───────────────────────────────────────────────────
-function AgonColin() {
+function AgonColin({ onSimulate }: { onSimulate: (id: string) => void }) {
   const items = [
     { name: 'Acetilcolina (ACh)', rec: 'M1–M5, Nm, Nn', sub: 'Agonista endógeno — ação direta',
       mec: 'Neurotransmissor colinérgico endógeno. Não utilizada clinicamente — rapidamente degradada pelas enzimas plasmáticas.',
       uso: 'Uso experimental e diagnóstico.', ec: 'Síndrome colinérgica completa (SLUDGE + bradicardia + broncoconstrição).', color: '#27ae60', bhe: '—' },
-    { name: 'Betanecol', rec: 'M1, M2, M3', sub: 'Éster de colina — ação direta',
+    { drugId: 'betanecol', name: 'Betanecol', rec: 'M1, M2, M3', sub: 'Éster de colina — ação direta',
       mec: 'Agonista muscarínico, especialmente M3. Estimula peristalse TGI e contração detrusor.',
       uso: 'Atonia intestinal (íleo paralítico pós-operatório), retenção urinária. Não atravessa BHE.',
       ec: 'Diarreia, cólicas, náuseas.', color: '#27ae60', bhe: 'Não atravessa BHE' },
-    { name: 'Carbacol', rec: 'M + N', sub: 'Éster de colina — resistente à AChE',
+    { drugId: 'carbacol', name: 'Carbacol', rec: 'M + N', sub: 'Éster de colina — resistente à AChE',
       mec: 'Resistente à acetilcolinesterase. Pode estimular receptores nicotínicos.',
       uso: 'Glaucoma (reduz PIO + miose), cirurgia de catarata, esvaziamento vesical. Não atravessa BHE.',
       ec: 'Bradicardia, hipotensão, sudorese, sialorreia.', color: '#27ae60', bhe: 'Não atravessa BHE' },
-    { name: 'Pilocarpina', rec: 'M1, M2, M3', sub: 'Alcaloide natural — ação direta',
+    { drugId: 'pilocarpina', name: 'Pilocarpina', rec: 'M1, M2, M3', sub: 'Alcaloide natural — ação direta',
       mec: 'Agonista muscarínico. Contrai M. ciliar → drenagem humor aquoso. Amina terciária.',
       uso: 'Glaucoma (↓ pressão intraocular), xerostomia (boca seca), síndrome de Sjögren.',
       ec: 'Náuseas, sudorese, vômitos, diarreia, broncoconstrição, incontinência urinária.', color: '#27ae60', bhe: 'Atravessa BHE' },
     { name: 'Muscarina', rec: 'M1–M5', sub: 'Alcaloide natural — ação direta',
       mec: 'Agonista muscarínico. Imita a síndrome colinérgica. Única amina quaternária que atravessa BHE.',
       uso: 'Sem uso clínico — presente em cogumelos venenosos.', ec: 'Síndrome colinérgica completa.', color: '#27ae60', bhe: 'Atravessa BHE (único amônio quaternário)' },
-    { name: 'Neostigmina', rec: 'AChE (indireto)', sub: 'Anticolinesterásico — carbamato reversível',
+    { drugId: 'neostigmina', name: 'Neostigmina', rec: 'AChE (indireto)', sub: 'Anticolinesterásico — carbamato reversível',
       mec: 'Inibe AChE reversivelmente → ↑ ACh. Não atravessa BHE.',
       uso: 'Reversão de bloqueio neuromuscular (anestesias), miastenia gravis.',
       ec: 'SLUDGE, broncoespasmo, bradicardia.', color: '#27ae60', bhe: 'Não atravessa BHE' },
-    { name: 'Fisostigmina (Eserina)', rec: 'AChE (indireto)', sub: 'Anticolinesterásico — carbamato reversível',
+    { drugId: 'fisostigmina', name: 'Fisostigmina (Eserina)', rec: 'AChE (indireto)', sub: 'Anticolinesterásico — carbamato reversível',
       mec: 'Inibe AChE reversivelmente. Atravessa BHE — efeitos centrais.',
       uso: 'Intoxicação por atropina (antídoto), glaucoma.',
       ec: 'SLUDGE + efeitos centrais (convulsão em overdose).', color: '#27ae60', bhe: 'Atravessa BHE' },
@@ -620,14 +645,19 @@ function AgonColin() {
             </div>
             <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
               <Pill color={drug.color}>{drug.rec}</Pill>
-              <Pill color={drug.bhe.startsWith('Não') ? '#e74c3c' : drug.bhe === '—' ? '#6b7280' : '#2ecc71'}>
-                {drug.bhe}
+              <Pill color={(drug.bhe ?? '').startsWith('Não') ? '#e74c3c' : (drug.bhe ?? '') === '—' ? '#6b7280' : '#2ecc71'}>
+                {drug.bhe ?? '—'}
               </Pill>
             </div>
           </div>
           <p style={{ margin: '0 0 4px', fontSize: 12, color: '#8b949e', lineHeight: 1.5 }}><strong style={{ color: '#c9d1d9' }}>Mecanismo:</strong> {drug.mec}</p>
           <p style={{ margin: '0 0 4px', fontSize: 12, color: '#8b949e', lineHeight: 1.5 }}><strong style={{ color: '#2ecc71' }}>Uso clínico:</strong> {drug.uso}</p>
-          <p style={{ margin: 0, fontSize: 12, color: '#8b949e', lineHeight: 1.5 }}><strong style={{ color: '#e74c3c' }}>Efeitos colaterais:</strong> {drug.ec}</p>
+          <p style={{ margin: (drug as any).drugId ? '0 0 10px' : 0, fontSize: 12, color: '#8b949e', lineHeight: 1.5 }}><strong style={{ color: '#e74c3c' }}>Efeitos colaterais:</strong> {drug.ec}</p>
+          {(drug as any).drugId && (
+            <button onClick={() => onSimulate((drug as any).drugId)} style={{ background: '#27ae6018', border: '1px solid #27ae6044', borderRadius: 5, padding: '5px 12px', color: '#27ae60', fontSize: 11, fontWeight: 600, cursor: 'pointer' }}>
+              Ver no boneco
+            </button>
+          )}
         </div>
       ))}
     </div>
@@ -635,21 +665,21 @@ function AgonColin() {
 }
 
 // ─── BLOQUEADORES COLINÉRGICOS ────────────────────────────────────────────────
-function BloqColin() {
+function BloqColin({ onSimulate }: { onSimulate: (id: string) => void }) {
   const items = [
-    { name: 'Atropina', rec: 'M1, M2, M3', sub: 'Alcaloide natural — antagonista direto',
+    { drugId: 'atropina', name: 'Atropina', rec: 'M1, M2, M3', sub: 'Alcaloide natural — antagonista direto',
       mec: 'Antagonismo competitivo em todos os receptores muscarínicos. Atravessa BHE.',
       uso: 'Bradicardia sinusal, midríase (diagnóstico), antídoto da crise colinérgica (organofosforados, aldicarb).',
       ec: 'Taquicardia, boca seca (xerostomia), retenção urinária, constipação, midríase, hipertermia (↓ sudorese), agitação (SNC).', color: '#8e44ad', bhe: 'Atravessa BHE' },
-    { name: 'Escopolamina (Hioscina)', rec: 'M1, M2, M3', sub: 'Alcaloide — efeito sedativo central',
+    { drugId: 'escopolamina', name: 'Escopolamina (Hioscina)', rec: 'M1, M2, M3', sub: 'Alcaloide — efeito sedativo central',
       mec: 'Antagonista muscarínico. Atravessa BHE → amnesia e sedação. Buscopan = hioscina levogiro.',
       uso: 'Cinetose (náuseas/vômitos — M1), dismenorreia, cólicas abdominais (↓ motilidade TGI).',
       ec: 'Sonolência, amnesia, boca seca, visão embaçada, retenção urinária.', color: '#8e44ad', bhe: 'Atravessa BHE' },
-    { name: 'Glicopirrolato', rec: 'M1, M2, M3', sub: 'Amônio quaternário — sem efeito central',
+    { drugId: 'glicopirrolato', name: 'Glicopirrolato', rec: 'M1, M2, M3', sub: 'Amônio quaternário — sem efeito central',
       mec: 'Antagonista muscarínico. Não atravessa BHE — sem efeitos no SNC.',
       uso: 'Espasmos do TGI, reverter bradicardia (intraoperatória), adjuvante com neostigmina.',
       ec: 'Boca seca, taquicardia, constipação, retenção urinária.', color: '#8e44ad', bhe: 'Não atravessa BHE' },
-    { name: 'Ipratrópio', rec: 'M1, M2, M3', sub: 'Amônio quaternário — uso inalatório',
+    { drugId: 'ipratropio', name: 'Ipratrópio', rec: 'M1, M2, M3', sub: 'Amônio quaternário — uso inalatório',
       mec: 'Antagonista M3 local nos brônquios. Pouca absorção sistêmica. Inibe broncorreia e broncoconstrição.',
       uso: 'Asma, bronquite crônica, enfisema, DPOC.',
       ec: 'Boca seca, congestão nasal (mínimos efeitos sistêmicos).', color: '#8e44ad', bhe: 'Não atravessa BHE' },
@@ -702,7 +732,12 @@ function BloqColin() {
           </div>
           <p style={{ margin: '0 0 4px', fontSize: 12, color: '#8b949e', lineHeight: 1.5 }}><strong style={{ color: '#c9d1d9' }}>Mecanismo:</strong> {drug.mec}</p>
           <p style={{ margin: '0 0 4px', fontSize: 12, color: '#8b949e', lineHeight: 1.5 }}><strong style={{ color: '#2ecc71' }}>Uso clínico:</strong> {drug.uso}</p>
-          <p style={{ margin: 0, fontSize: 12, color: '#8b949e', lineHeight: 1.5 }}><strong style={{ color: '#e74c3c' }}>Efeitos colaterais:</strong> {drug.ec}</p>
+          <p style={{ margin: (drug as any).drugId ? '0 0 10px' : 0, fontSize: 12, color: '#8b949e', lineHeight: 1.5 }}><strong style={{ color: '#e74c3c' }}>Efeitos colaterais:</strong> {drug.ec}</p>
+          {(drug as any).drugId && (
+            <button onClick={() => onSimulate((drug as any).drugId)} style={{ background: '#8e44ad18', border: '1px solid #8e44ad44', borderRadius: 5, padding: '5px 12px', color: '#8e44ad', fontSize: 11, fontWeight: 600, cursor: 'pointer' }}>
+              Ver no boneco
+            </button>
+          )}
         </div>
       ))}
     </div>
@@ -767,7 +802,10 @@ function InterSection({ onSimulate }: { onSimulate: (id1: string, id2: string) =
 }
 
 // ─── DRUG LIST HELPER ─────────────────────────────────────────────────────────
-function DrugList({ items }: { items: Array<{ name: string; rec: string; sub: string; mec: string; uso: string; ec: string; color: string; bhe?: string }> }) {
+function DrugList({ items, onSimulate }: {
+  items: Array<{ name: string; rec: string; sub: string; mec: string; uso: string; ec: string; color: string; bhe?: string; drugId?: string }>;
+  onSimulate?: (id: string) => void;
+}) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
       {items.map(drug => (
@@ -781,9 +819,81 @@ function DrugList({ items }: { items: Array<{ name: string; rec: string; sub: st
           </div>
           <p style={{ margin: '0 0 4px', fontSize: 12, color: '#8b949e', lineHeight: 1.5 }}><strong style={{ color: '#c9d1d9' }}>Mecanismo:</strong> {drug.mec}</p>
           <p style={{ margin: '0 0 4px', fontSize: 12, color: '#8b949e', lineHeight: 1.5 }}><strong style={{ color: '#2ecc71' }}>Uso clínico:</strong> {drug.uso}</p>
-          <p style={{ margin: 0, fontSize: 12, color: '#8b949e', lineHeight: 1.5 }}><strong style={{ color: '#e74c3c' }}>Efeitos colaterais:</strong> {drug.ec}</p>
+          <p style={{ margin: drug.drugId && onSimulate ? '0 0 10px' : 0, fontSize: 12, color: '#8b949e', lineHeight: 1.5 }}><strong style={{ color: '#e74c3c' }}>Efeitos colaterais:</strong> {drug.ec}</p>
+          {drug.drugId && onSimulate && (
+            <button
+              onClick={() => onSimulate(drug.drugId!)}
+              style={{ background: `${drug.color}18`, border: `1px solid ${drug.color}44`, borderRadius: 5, padding: '5px 12px', color: drug.color, fontSize: 11, fontWeight: 600, cursor: 'pointer' }}
+            >
+              Ver no boneco
+            </button>
+          )}
         </div>
       ))}
+    </div>
+  );
+}
+
+// ─── SOBRE ESTE PROJETO ──────────────────────────────────────────────────────
+function SobreSection() {
+  const techs = [
+    { name: 'React 19',         desc: 'Biblioteca JavaScript para construção de interfaces de usuário com componentes reutilizáveis.' },
+    { name: 'TypeScript',       desc: 'Superset do JavaScript com tipagem estática, garantindo segurança e autocompletar durante o desenvolvimento.' },
+    { name: 'Vite',             desc: 'Ferramenta de build moderna, com servidor de desenvolvimento ultrarrápido e hot module replacement (HMR).' },
+    { name: 'Tailwind CSS v4',  desc: 'Framework de CSS utilitário configurado diretamente via plugin Vite, sem arquivo de configuração separado.' },
+    { name: 'Vercel',           desc: 'Plataforma de hospedagem e deploy contínuo. O site é atualizado automaticamente a cada novo push.' },
+    { name: 'GitHub',           desc: 'Versionamento do código-fonte com controle de histórico de mudanças e colaboração.' },
+  ];
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+
+      {/* Apresentação */}
+      <InfoBox color="#c9d1d9">
+        Este simulador foi desenvolvido como ferramenta de apoio ao estudo da farmacologia do sistema nervoso autônomo,
+        permitindo visualizar de forma interativa os efeitos de fármacos adrenérgicos e colinérgicos no organismo humano.
+      </InfoBox>
+
+      {/* Criador */}
+      <div style={{ background: '#111c2b', border: '1px solid #2ecc7133', borderRadius: 12, padding: '20px 24px' }}>
+        <div style={{ fontSize: 11, color: '#2ecc71', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 600, marginBottom: 10 }}>
+          Desenvolvido por
+        </div>
+        <div style={{ fontSize: 20, fontWeight: 700, color: '#e6edf3', marginBottom: 4 }}>Cláudio Rocha</div>
+        <div style={{ fontSize: 13, color: '#8b949e', marginBottom: 12 }}>
+          Estudante de Medicina · 3º Período · Turma 158 · Universidade Federal de Pernambuco (UFPE)
+        </div>
+        <a
+          href="mailto:claudio.filho@ufpe.br"
+          style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: '#2ecc7115', border: '1px solid #2ecc7144', borderRadius: 6, padding: '7px 14px', color: '#2ecc71', fontSize: 13, textDecoration: 'none', fontWeight: 500 }}
+        >
+          claudio.filho@ufpe.br
+        </a>
+      </div>
+
+      {/* Tecnologias */}
+      <div>
+        <SectionTitle>Tecnologias Utilizadas</SectionTitle>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginTop: 8 }}>
+          {techs.map(t => (
+            <div key={t.name} style={{ background: '#111c2b', border: '1px solid #21262d', borderRadius: 8, padding: '12px 14px' }}>
+              <div style={{ color: '#e6edf3', fontWeight: 700, fontSize: 13, marginBottom: 4 }}>{t.name}</div>
+              <p style={{ margin: 0, fontSize: 12, color: '#6b7280', lineHeight: 1.6 }}>{t.desc}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Objetivo */}
+      <div style={{ background: '#111c2b', border: '1px solid #7fdbff22', borderLeft: '3px solid #7fdbff55', borderRadius: 8, padding: '14px 18px' }}>
+        <div style={{ color: '#7fdbff', fontWeight: 600, fontSize: 13, marginBottom: 6 }}>Objetivo educacional</div>
+        <p style={{ margin: 0, fontSize: 12, color: '#8b949e', lineHeight: 1.7 }}>
+          O simulador visa complementar o aprendizado teórico de farmacologia, tornando visíveis os efeitos
+          fisiológicos de fármacos sobre o sistema nervoso autônomo. Não substitui o estudo aprofundado nem
+          deve ser utilizado para fins clínicos ou de prescrição médica.
+        </p>
+      </div>
+
     </div>
   );
 }
