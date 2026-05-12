@@ -29,8 +29,8 @@ export default function Character({ bodyState, vitals }: Props) {
     ? '#e74c3c' : bodyState.skinVasodilation < -0.2 ? '#7f8c8d' : '#c0392b';
   const vesselWidth = Math.max(0.8, 1.5 + bodyState.skinVasodilation * 2.5);
 
-  const pupilR = Math.min(9.2, 2.5 + bodyState.pupilNormalized * 8);
-  const irisR  = Math.min(9.5, 4   + bodyState.pupilNormalized * 2);
+  const irisR  = 7;
+  const pupilR = Math.min(irisR - 0.6, Math.max(1.8, 1.8 + bodyState.pupilNormalized * 6.2));
 
   const lungFill   = bodyState.bronchialNormalized > 1.1
     ? 'rgba(205,145,145,0.52)' : bodyState.bronchialNormalized < 0.85
@@ -258,27 +258,46 @@ export default function Character({ bodyState, vitals }: Props) {
         <path d="M 108,112 C 114,130 132,141 150,143 C 168,141 186,130 192,112" fill="none" stroke="rgba(0,0,0,0.07)" strokeWidth="1.8"/>
 
         {/* ── FACE ──────────────────────────────────────── */}
-        {/* Eye whites */}
-        <ellipse cx="122" cy="73" rx="14" ry="10" fill="white" stroke="rgba(0,0,0,0.28)" strokeWidth="1"/>
-        <ellipse cx="178" cy="73" rx="14" ry="10" fill="white" stroke="rgba(0,0,0,0.28)" strokeWidth="1"/>
-        {/* Irises */}
-        <circle cx="122" cy="73" r={irisR}  fill="#2c1a08"/>
-        <circle cx="178" cy="73" r={irisR}  fill="#2c1a08"/>
-        {/* Pupils */}
-        <circle cx="122" cy="73" r={pupilR} fill="#0a0a0a"/>
-        <circle cx="178" cy="73" r={pupilR} fill="#0a0a0a"/>
-        {/* Highlights */}
-        <circle cx="125" cy="70" r="1.9" fill="rgba(255,255,255,0.88)"/>
-        <circle cx="181" cy="70" r="1.9" fill="rgba(255,255,255,0.88)"/>
-        {/* Upper eyelid */}
-        <path d="M 108,73 C 112,64 132,64 136,73" fill="none" stroke="rgba(0,0,0,0.28)" strokeWidth="1.3"/>
-        <path d="M 164,73 C 168,64 188,64 192,73" fill="none" stroke="rgba(0,0,0,0.28)" strokeWidth="1.3"/>
-        {/* Lower eyelid / under-eye */}
-        <path d="M 108,73 C 112,79 132,80 136,73" fill={skinColor} stroke="rgba(0,0,0,0.12)" strokeWidth="0.8" opacity="0.75"/>
-        <path d="M 164,73 C 168,79 188,80 192,73" fill={skinColor} stroke="rgba(0,0,0,0.12)" strokeWidth="0.8" opacity="0.75"/>
+        <defs>
+          <clipPath id="cl"><ellipse cx="122" cy="74" rx="13" ry="9"/></clipPath>
+          <clipPath id="cr"><ellipse cx="178" cy="74" rx="13" ry="9"/></clipPath>
+        </defs>
+
         {/* Eyebrows */}
-        <path d="M 108,59 C 115,52 130,51 136,56" fill="none" stroke="#0a0a0a" strokeWidth="2.8" strokeLinecap="round"/>
-        <path d="M 164,56 C 170,51 185,52 192,59" fill="none" stroke="#0a0a0a" strokeWidth="2.8" strokeLinecap="round"/>
+        <path d="M 109,59 C 116,52 131,51 137,56" fill="none" stroke="#0a0a0a" strokeWidth="2.6" strokeLinecap="round"/>
+        <path d="M 163,56 C 169,51 184,52 191,59" fill="none" stroke="#0a0a0a" strokeWidth="2.6" strokeLinecap="round"/>
+
+        {/* === OLHO ESQUERDO === */}
+        {/* Branco */}
+        <ellipse cx="122" cy="74" rx="14" ry="10" fill="white" stroke="rgba(0,0,0,0.18)" strokeWidth="0.8"/>
+        {/* Íris — marrom médio, contida pelo clip */}
+        <circle cx="122" cy="75" r={irisR} fill="#7a4a1a" clipPath="url(#cl)"/>
+        {/* Limbo (borda escura da íris) */}
+        <circle cx="122" cy="75" r={irisR} fill="none" stroke="rgba(0,0,0,0.45)" strokeWidth="1" clipPath="url(#cl)"/>
+        {/* Pupila */}
+        <circle cx="122" cy="75" r={pupilR} fill="#0a0a0a" clipPath="url(#cl)"/>
+        {/* Reflexo */}
+        <circle cx="125" cy="72" r="1.6" fill="rgba(255,255,255,0.92)" clipPath="url(#cl)"/>
+        <circle cx="127" cy="74" r="0.7" fill="rgba(255,255,255,0.5)" clipPath="url(#cl)"/>
+        {/* Pálpebra superior (tampa a parte de cima do olho) */}
+        <path d="M 108,74 C 112,63 132,63 136,74" fill={skinColor} clipPath="url(#cl)"/>
+        <path d="M 108,74 C 112,63 132,63 136,74" fill="none" stroke="rgba(0,0,0,0.32)" strokeWidth="1.2"/>
+        {/* Contorno do olho */}
+        <ellipse cx="122" cy="74" rx="14" ry="10" fill="none" stroke="rgba(0,0,0,0.22)" strokeWidth="1"/>
+        {/* Cílios inferiores (linha fina) */}
+        <path d="M 110,79 C 118,82 126,82 134,79" fill="none" stroke="rgba(0,0,0,0.15)" strokeWidth="0.8"/>
+
+        {/* === OLHO DIREITO === */}
+        <ellipse cx="178" cy="74" rx="14" ry="10" fill="white" stroke="rgba(0,0,0,0.18)" strokeWidth="0.8"/>
+        <circle cx="178" cy="75" r={irisR} fill="#7a4a1a" clipPath="url(#cr)"/>
+        <circle cx="178" cy="75" r={irisR} fill="none" stroke="rgba(0,0,0,0.45)" strokeWidth="1" clipPath="url(#cr)"/>
+        <circle cx="178" cy="75" r={pupilR} fill="#0a0a0a" clipPath="url(#cr)"/>
+        <circle cx="181" cy="72" r="1.6" fill="rgba(255,255,255,0.92)" clipPath="url(#cr)"/>
+        <circle cx="183" cy="74" r="0.7" fill="rgba(255,255,255,0.5)" clipPath="url(#cr)"/>
+        <path d="M 164,74 C 168,63 188,63 192,74" fill={skinColor} clipPath="url(#cr)"/>
+        <path d="M 164,74 C 168,63 188,63 192,74" fill="none" stroke="rgba(0,0,0,0.32)" strokeWidth="1.2"/>
+        <ellipse cx="178" cy="74" rx="14" ry="10" fill="none" stroke="rgba(0,0,0,0.22)" strokeWidth="1"/>
+        <path d="M 166,79 C 174,82 182,82 190,79" fill="none" stroke="rgba(0,0,0,0.15)" strokeWidth="0.8"/>
         {/* Nose */}
         <path d="M 150,85 C 146,91 144,97 147,102 C 150,105 153,102 156,97 C 158,91 150,85 150,85" fill="none" stroke="rgba(0,0,0,0.11)" strokeWidth="1.4"/>
         <path d="M 146,101 C 143,103 143,106 146,107 M 154,107 C 157,106 157,103 154,101" fill="none" stroke="rgba(0,0,0,0.1)" strokeWidth="1.2" strokeLinecap="round"/>
